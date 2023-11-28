@@ -1,5 +1,5 @@
 //******************************************************************************
-/// @FILE    system_wrapper_pl.v
+/// @FILE    system_pl_wrapper.v
 /// @AUTHOR  JAY CONVERTINO
 /// @DATE    2023.11.02
 /// @BRIEF   System wrapper for pl only.
@@ -26,7 +26,7 @@
 ///  IN THE SOFTWARE.
 //******************************************************************************
 
-module system_wrapper_pl #(
+module system_pl_wrapper #(
     parameter FPGA_TECHNOLOGY = 0,
     parameter FPGA_FAMILY = 0,
     parameter SPEED_GRADE = 0,
@@ -169,7 +169,7 @@ module system_wrapper_pl #(
     input  [ 5:0]   dac_m_src_axi_bid
   );
 
-  ad9361_wrapper_pl #(
+  ad9361_pl_wrapper #(
     .FPGA_TECHNOLOGY(FPGA_TECHNOLOGY),
     .FPGA_FAMILY(FPGA_FAMILY),
     .SPEED_GRADE(SPEED_GRADE),
@@ -177,7 +177,7 @@ module system_wrapper_pl #(
     .ADC_INIT_DELAY(ADC_INIT_DELAY),
     .DAC_INIT_DELAY(DAC_INIT_DELAY),
     .DELAY_REFCLK_FREQUENCY(DELAY_REFCLK_FREQUENCY)
-  ) inst_ad9361_wrapper_pl (
+  ) inst_ad9361_pl_wrapper (
     //AXI4LITE SLAVE INTERFACE TO CROSSBAR
     .axi_aclk(axi_aclk),
     .axi_aresetn(axi_aresetn),

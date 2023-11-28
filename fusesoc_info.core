@@ -6,28 +6,18 @@ description: AFRL conversion of fmcomms2-3 to fusesoc. This is a minimal system.
 filesets:
   src_xilinx:
     files:
-      - common/xilinx/ad9361_wrapper_pl.v : {file_type : verilogSource}
-      - common/xilinx/ad9361_gen_pl.tcl : {file_type : tclSource}
+      - common/xilinx/ad9361_pl_wrapper.v : {file_type : verilogSource}
+      - common/xilinx/ad9361_pl_gen.tcl : {file_type : tclSource}
     depend:
      - AFRL:utility:tcl_version_check:1.0.0
      - AFRL:utility:vivado_board_support_packages
-
-  src_zynq_arm32:
-    files:
-      - common/xilinx/zynq_arm32/system_wrapper_ps.v : {file_type : verilogSource}
-      - common/xilinx/zynq_arm32/system_gen_ps.tcl : {file_type : tclSource}
-
-  src_zynq_ultrascale_arm64:
-    files:
-      - common/xilinx/zynq_ultrascale_arm64/system_wrapper_ps.v : {file_type : verilogSource}
-      - common/xilinx/zynq_ultrascale_arm64/system_gen_ps.tcl : {file_type : tclSource}
 
   zed:
     files:
       - zed/system_constr.xdc : {file_type : xdc}
       - zed/system_wrapper.v : {file_type : verilogSource}
-      - zed/system_wrapper_pl.v : {file_type : verilogSource}
-      - zed/system_gen_pl.tcl : {file_type : tclSource}
+      - zed/system_pl_wrapper.v : {file_type : verilogSource}
+      - zed/system_pl_gen.tcl : {file_type : tclSource}
       - zed/system_gen.tcl : {file_type : tclSource}
     depend:
       - AFRL:utility:digilent_zed_board:1.0.0
@@ -55,7 +45,7 @@ targets:
     <<: *default
     default_tool: vivado
     description: zedboard target.
-    filesets_append : ["tool_vivado ? (src_xilinx)", "tool_vivado ? (zed)", "tool_vivado ? (src_zynq_arm32)"]
+    filesets_append : ["tool_vivado ? (src_xilinx)", "tool_vivado ? (zed)"]
     tools:
       vivado:
         source_mgmt_mode: All

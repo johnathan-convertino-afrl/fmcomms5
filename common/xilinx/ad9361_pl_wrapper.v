@@ -1,5 +1,5 @@
 //******************************************************************************
-/// @FILE    ad9361_wrapper_pl.v
+/// @FILE    ad9361_pl_wrapper.v
 /// @AUTHOR  JAY CONVERTINO
 /// @DATE    2023.11.02
 /// @BRIEF   AD9361 core and support core wrapper.
@@ -26,7 +26,7 @@
 ///  IN THE SOFTWARE.
 //******************************************************************************
 
-module ad9361_wrapper_pl #(
+module ad9361_pl_wrapper #(
     parameter FPGA_TECHNOLOGY = 0,
     parameter FPGA_FAMILY = 0,
     parameter SPEED_GRADE = 0,

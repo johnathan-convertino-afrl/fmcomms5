@@ -229,7 +229,7 @@ module system_wrapper #(
   assign gpio_i[63:51] = gpio_o[63:51];
   assign gpio_i[48:47] = gpio_o[48:47];
 
-  system_wrapper_pl #(
+  system_pl_wrapper #(
     .FPGA_TECHNOLOGY(FPGA_TECHNOLOGY),
     .FPGA_FAMILY(FPGA_FAMILY),
     .SPEED_GRADE(SPEED_GRADE),
@@ -237,7 +237,7 @@ module system_wrapper #(
     .ADC_INIT_DELAY(ADC_INIT_DELAY),
     .DAC_INIT_DELAY(DAC_INIT_DELAY),
     .DELAY_REFCLK_FREQUENCY(DELAY_REFCLK_FREQUENCY)
-  ) inst_system_wrapper_pl (
+  ) inst_system_pl_wrapper (
     //AXI4LITE SLAVE INTERFACE TO CROSSBAR
     .axi_aclk(s_axi_clk),
     .axi_aresetn(s_axi_aresetn),
@@ -372,195 +372,170 @@ module system_wrapper #(
     .dac_m_src_axi_bid(dac_hp1_axi_bid)
   );
 
-  system_wrapper_ps inst_system_wrapper_ps
+  system_ps_wrapper inst_system_ps_wrapper
     (
       .GPIO_I(gpio_i),
       .GPIO_O(gpio_o),
       .GPIO_T(gpio_t),
       .SPI0_SCLK_I(1'b0),
       .SPI0_SCLK_O(spi_clk),
-      .SPI0_SCLK_T(), //not used
       .SPI0_MOSI_I(1'b0),
       .SPI0_MOSI_O(spi_mosi),
-      .SPI0_MOSI_T(), //not used
       .SPI0_MISO_I(spi_miso),
-      .SPI0_MISO_O(), //not used
-      .SPI0_MISO_T(), //not used
       .SPI0_SS_I(1'b1),
       .SPI0_SS_O(spi_csn),
-      .SPI0_SS1_O(), //not used
-      .SPI0_SS2_O(), //not used
-      .SPI0_SS_T(),  //not used
       .SPI1_SCLK_I(1'b0),
       .SPI1_SCLK_O(spi_udc_sclk),
-      .SPI1_SCLK_T(), //not used
       .SPI1_MOSI_I(spi_udc_data),
       .SPI1_MOSI_O(spi_udc_data),
-      .SPI1_MOSI_T(), //not used
       .SPI1_MISO_I(1'b0),
-      .SPI1_MISO_O(), //not used
-      .SPI1_MISO_T(), //not used
       .SPI1_SS_I(1'b1),
       .SPI1_SS_O(spi_udc_csn_tx),
       .SPI1_SS1_O(spi_udc_csn_rx),
       .SPI1_SS2_O(), //not used
-      .SPI1_SS_T(),  //not used
-      .USB0_VBUS_PWRFAULT(~otg_vbusoc),
-      .M_AXI_GP0_ARVALID(w_axi_arvalid),
-      .M_AXI_GP0_AWVALID(w_axi_awvalid),
-      .M_AXI_GP0_BREADY(w_axi_bready),
-      .M_AXI_GP0_RREADY(w_axi_rready),
-      .M_AXI_GP0_WLAST(), //not used
-      .M_AXI_GP0_WVALID(w_axi_wvalid),
-      .M_AXI_GP0_ARID(), //not used
-      .M_AXI_GP0_AWID(), //not used
-      .M_AXI_GP0_WID(),  //not used
-      .M_AXI_GP0_ARBURST(), //not used
-      .M_AXI_GP0_ARLOCK(),  //not used
-      .M_AXI_GP0_ARSIZE(),  //not used
-      .M_AXI_GP0_AWBURST(), //not used
-      .M_AXI_GP0_AWLOCK(),  //not used
-      .M_AXI_GP0_AWSIZE(),  //not used
-      .M_AXI_GP0_ARPROT(w_axi_arprot),
-      .M_AXI_GP0_AWPROT(w_axi_awprot),
-      .M_AXI_GP0_ARADDR(w_axi_araddr),
-      .M_AXI_GP0_AWADDR(w_axi_awaddr),
-      .M_AXI_GP0_WDATA(w_axi_wdata),
-      .M_AXI_GP0_ARCACHE(), //not used
-      .M_AXI_GP0_ARLEN(),   //not used
-      .M_AXI_GP0_ARQOS(),   //not used
-      .M_AXI_GP0_AWCACHE(), //not used
-      .M_AXI_GP0_AWLEN(),   //not used
-      .M_AXI_GP0_AWQOS(),   //not used
-      .M_AXI_GP0_WSTRB(w_axi_wstrb),
+      .USB0_vbus_pwrfault(~otg_vbusoc),
+      .M_AXI_GP0_arvalid(w_axi_arvalid),
+      .M_AXI_GP0_awvalid(w_axi_awvalid),
+      .M_AXI_GP0_bready(w_axi_bready),
+      .M_AXI_GP0_rready(w_axi_rready),
+      .M_AXI_GP0_wlast(), //not used
+      .M_AXI_GP0_wvalid(w_axi_wvalid),
+      .M_AXI_GP0_arid(), //not used
+      .M_AXI_GP0_awid(), //not used
+      .M_AXI_GP0_wid(),  //not used
+      .M_AXI_GP0_arburst(), //not used
+      .M_AXI_GP0_arlock(),  //not used
+      .M_AXI_GP0_arsize(),  //not used
+      .M_AXI_GP0_awburst(), //not used
+      .M_AXI_GP0_awlock(),  //not used
+      .M_AXI_GP0_awsize(),  //not used
+      .M_AXI_GP0_arprot(w_axi_arprot),
+      .M_AXI_GP0_awprot(w_axi_awprot),
+      .M_AXI_GP0_araddr(w_axi_araddr),
+      .M_AXI_GP0_awaddr(w_axi_awaddr),
+      .M_AXI_GP0_wdata(w_axi_wdata),
+      .M_AXI_GP0_arcache(), //not used
+      .M_AXI_GP0_arlen(),   //not used
+      .M_AXI_GP0_arqos(),   //not used
+      .M_AXI_GP0_awcache(), //not used
+      .M_AXI_GP0_awlen(),   //not used
+      .M_AXI_GP0_awqos(),   //not used
+      .M_AXI_GP0_wstrb(w_axi_wstrb),
       .M_AXI_GP0_ACLK(s_axi_clk),
-      .M_AXI_GP0_ARREADY(w_axi_arready),
-      .M_AXI_GP0_AWREADY(w_axi_awready),
-      .M_AXI_GP0_BVALID(w_axi_bvalid),
-      .M_AXI_GP0_RLAST(1'b0),  //not used
-      .M_AXI_GP0_RVALID(w_axi_rvalid),
-      .M_AXI_GP0_WREADY(w_axi_wready),
-      .M_AXI_GP0_BID({11{1'b0}}),    //not used
-      .M_AXI_GP0_RID({11{1'b0}}),    //not used
-      .M_AXI_GP0_BRESP(w_axi_bresp),
-      .M_AXI_GP0_RRESP(w_axi_rresp),
-      .M_AXI_GP0_RDATA(w_axi_rdata),
-      .S_AXI_HP0_ARREADY(adc_hp0_axi_arready),
-      .S_AXI_HP0_AWREADY(adc_hp0_axi_awready),
-      .S_AXI_HP0_BVALID(adc_hp0_axi_bvalid),
-      .S_AXI_HP0_RLAST(adc_hp0_axi_rlast),
-      .S_AXI_HP0_RVALID(adc_hp0_axi_rvalid),
-      .S_AXI_HP0_WREADY(adc_hp0_axi_wready),
-      .S_AXI_HP0_BRESP(adc_hp0_axi_bresp),
-      .S_AXI_HP0_RRESP(adc_hp0_axi_rresp),
-      .S_AXI_HP0_BID(adc_hp0_axi_bid),
-      .S_AXI_HP0_RID(adc_hp0_axi_rid),
-      .S_AXI_HP0_RDATA(adc_hp0_axi_rdata),
-      .S_AXI_HP0_RCOUNT(), //not used
-      .S_AXI_HP0_WCOUNT(), //not used
-      .S_AXI_HP0_RACOUNT(), //not used
-      .S_AXI_HP0_WACOUNT(), //not used
+      .M_AXI_GP0_arready(w_axi_arready),
+      .M_AXI_GP0_awready(w_axi_awready),
+      .M_AXI_GP0_bvalid(w_axi_bvalid),
+      .M_AXI_GP0_rlast(1'b0),  //not used
+      .M_AXI_GP0_rvalid(w_axi_rvalid),
+      .M_AXI_GP0_wready(w_axi_wready),
+      .M_AXI_GP0_bid({11{1'b0}}),    //not used
+      .M_AXI_GP0_rid({11{1'b0}}),    //not used
+      .M_AXI_GP0_bresp(w_axi_bresp),
+      .M_AXI_GP0_rresp(w_axi_rresp),
+      .M_AXI_GP0_rdata(w_axi_rdata),
+      .S_AXI_HP0_arready(adc_hp0_axi_arready),
+      .S_AXI_HP0_awready(adc_hp0_axi_awready),
+      .S_AXI_HP0_bvalid(adc_hp0_axi_bvalid),
+      .S_AXI_HP0_rlast(adc_hp0_axi_rlast),
+      .S_AXI_HP0_rvalid(adc_hp0_axi_rvalid),
+      .S_AXI_HP0_wready(adc_hp0_axi_wready),
+      .S_AXI_HP0_bresp(adc_hp0_axi_bresp),
+      .S_AXI_HP0_rresp(adc_hp0_axi_rresp),
+      .S_AXI_HP0_bid(adc_hp0_axi_bid),
+      .S_AXI_HP0_rid(adc_hp0_axi_rid),
+      .S_AXI_HP0_rdata(adc_hp0_axi_rdata),
       .S_AXI_HP0_ACLK(s_axi_clk),
-      .S_AXI_HP0_ARVALID(adc_hp0_axi_arvalid),
-      .S_AXI_HP0_AWVALID(adc_hp0_axi_wvalid),
-      .S_AXI_HP0_BREADY(adc_hp0_axi_bready),
-      .S_AXI_HP0_RDISSUECAP1_EN(),  //not used
-      .S_AXI_HP0_RREADY(adc_hp0_axi_rready),
-      .S_AXI_HP0_WLAST(adc_hp0_axi_wlast),
-      .S_AXI_HP0_WRISSUECAP1_EN(), //not used
-      .S_AXI_HP0_WVALID(adc_hp0_axi_wvalid),
-      .S_AXI_HP0_ARBURST(adc_hp0_axi_arburst),
-      .S_AXI_HP0_ARLOCK(adc_hp0_axi_arlock),
-      .S_AXI_HP0_ARSIZE(adc_hp0_axi_arsize),
-      .S_AXI_HP0_AWBURST(adc_hp0_axi_awburst),
-      .S_AXI_HP0_AWLOCK(adc_hp0_axi_awlock),
-      .S_AXI_HP0_AWSIZE(adc_hp0_axi_awsize),
-      .S_AXI_HP0_ARPROT(adc_hp0_axi_arprot),
-      .S_AXI_HP0_AWPROT(adc_hp0_axi_awprot),
-      .S_AXI_HP0_ARADDR(adc_hp0_axi_araddr),
-      .S_AXI_HP0_AWADDR(adc_hp0_axi_awaddr),
-      .S_AXI_HP0_ARCACHE(adc_hp0_axi_arcache),
-      .S_AXI_HP0_ARLEN(adc_hp0_axi_arlen),
-      .S_AXI_HP0_ARQOS(), //not used
-      .S_AXI_HP0_AWCACHE(adc_hp0_axi_awcache),
-      .S_AXI_HP0_AWLEN(adc_hp0_axi_awlen),
-      .S_AXI_HP0_AWQOS(), //not used
-      .S_AXI_HP0_ARID(adc_hp0_axi_arid),
-      .S_AXI_HP0_AWID(adc_hp0_axi_awid),
-      .S_AXI_HP0_WID(adc_hp0_axi_wid),
-      .S_AXI_HP0_WDATA(adc_hp0_axi_wdata),
-      .S_AXI_HP0_WSTRB(adc_hp0_axi_wstrb),
-      .S_AXI_HP1_ARREADY(dac_hp1_axi_arready),
-      .S_AXI_HP1_AWREADY(dac_hp1_axi_awready),
-      .S_AXI_HP1_BVALID(dac_hp1_axi_bvalid),
-      .S_AXI_HP1_RLAST(dac_hp1_axi_rlast),
-      .S_AXI_HP1_RVALID(dac_hp1_axi_rvalid),
-      .S_AXI_HP1_WREADY(dac_hp1_axi_wready),
-      .S_AXI_HP1_BRESP(dac_hp1_axi_bresp),
-      .S_AXI_HP1_RRESP(dac_hp1_axi_rresp),
-      .S_AXI_HP1_BID(dac_hp1_axi_bid),
-      .S_AXI_HP1_RID(dac_hp1_axi_rid),
-      .S_AXI_HP1_RDATA(dac_hp1_axi_rdata),
-      .S_AXI_HP1_RCOUNT(), //not used
-      .S_AXI_HP1_WCOUNT(), //not used
-      .S_AXI_HP1_RACOUNT(),//not used
-      .S_AXI_HP1_WACOUNT(),//not used
+      .S_AXI_HP0_arvalid(adc_hp0_axi_arvalid),
+      .S_AXI_HP0_awvalid(adc_hp0_axi_wvalid),
+      .S_AXI_HP0_bready(adc_hp0_axi_bready),
+      .S_AXI_HP0_rready(adc_hp0_axi_rready),
+      .S_AXI_HP0_wlast(adc_hp0_axi_wlast),
+      .S_AXI_HP0_wvalid(adc_hp0_axi_wvalid),
+      .S_AXI_HP0_arburst(adc_hp0_axi_arburst),
+      .S_AXI_HP0_arlock(adc_hp0_axi_arlock),
+      .S_AXI_HP0_arsize(adc_hp0_axi_arsize),
+      .S_AXI_HP0_awburst(adc_hp0_axi_awburst),
+      .S_AXI_HP0_awlock(adc_hp0_axi_awlock),
+      .S_AXI_HP0_awsize(adc_hp0_axi_awsize),
+      .S_AXI_HP0_arprot(adc_hp0_axi_arprot),
+      .S_AXI_HP0_awprot(adc_hp0_axi_awprot),
+      .S_AXI_HP0_araddr(adc_hp0_axi_araddr),
+      .S_AXI_HP0_awaddr(adc_hp0_axi_awaddr),
+      .S_AXI_HP0_arcache(adc_hp0_axi_arcache),
+      .S_AXI_HP0_arlen(adc_hp0_axi_arlen),
+      .S_AXI_HP0_arqos(), //not used
+      .S_AXI_HP0_awcache(adc_hp0_axi_awcache),
+      .S_AXI_HP0_awlen(adc_hp0_axi_awlen),
+      .S_AXI_HP0_awqos(), //not used
+      .S_AXI_HP0_arid(adc_hp0_axi_arid),
+      .S_AXI_HP0_awid(adc_hp0_axi_awid),
+      .S_AXI_HP0_wid(adc_hp0_axi_wid),
+      .S_AXI_HP0_wdata(adc_hp0_axi_wdata),
+      .S_AXI_HP0_wstrb(adc_hp0_axi_wstrb),
+      .S_AXI_HP1_arready(dac_hp1_axi_arready),
+      .S_AXI_HP1_awready(dac_hp1_axi_awready),
+      .S_AXI_HP1_bvalid(dac_hp1_axi_bvalid),
+      .S_AXI_HP1_rlast(dac_hp1_axi_rlast),
+      .S_AXI_HP1_rvalid(dac_hp1_axi_rvalid),
+      .S_AXI_HP1_wready(dac_hp1_axi_wready),
+      .S_AXI_HP1_bresp(dac_hp1_axi_bresp),
+      .S_AXI_HP1_rresp(dac_hp1_axi_rresp),
+      .S_AXI_HP1_bid(dac_hp1_axi_bid),
+      .S_AXI_HP1_rid(dac_hp1_axi_rid),
+      .S_AXI_HP1_rdata(dac_hp1_axi_rdata),
       .S_AXI_HP1_ACLK(s_axi_clk),
-      .S_AXI_HP1_ARVALID(dac_hp1_axi_arvalid),
-      .S_AXI_HP1_AWVALID(dac_hp1_axi_awvalid),
-      .S_AXI_HP1_BREADY(dac_hp1_axi_bready),
-      .S_AXI_HP1_RDISSUECAP1_EN(), //not used
-      .S_AXI_HP1_RREADY(dac_hp1_axi_rready),
-      .S_AXI_HP1_WLAST(dac_hp1_axi_wlast),
-      .S_AXI_HP1_WRISSUECAP1_EN(), //not used
-      .S_AXI_HP1_WVALID(dac_hp1_axi_wvalid),
-      .S_AXI_HP1_ARBURST(dac_hp1_axi_arburst),
-      .S_AXI_HP1_ARLOCK(dac_hp1_axi_arlock),
-      .S_AXI_HP1_ARSIZE(dac_hp1_axi_arsize),
-      .S_AXI_HP1_AWBURST(dac_hp1_axi_awburst),
-      .S_AXI_HP1_AWLOCK(dac_hp1_axi_awlock),
-      .S_AXI_HP1_AWSIZE(dac_hp1_axi_awsize),
-      .S_AXI_HP1_ARPROT(dac_hp1_axi_arprot),
-      .S_AXI_HP1_AWPROT(dac_hp1_axi_awprot),
-      .S_AXI_HP1_ARADDR(dac_hp1_axi_araddr),
-      .S_AXI_HP1_AWADDR(dac_hp1_axi_awaddr),
-      .S_AXI_HP1_ARCACHE(dac_hp1_axi_arcache),
-      .S_AXI_HP1_ARLEN(dac_hp1_axi_arlen),
-      .S_AXI_HP1_ARQOS(), //not used
-      .S_AXI_HP1_AWCACHE(dac_hp1_axi_awcache),
-      .S_AXI_HP1_AWLEN(dac_hp1_axi_awlen),
-      .S_AXI_HP1_AWQOS(), //not used
-      .S_AXI_HP1_ARID(dac_hp1_axi_arid),
-      .S_AXI_HP1_AWID(dac_hp1_axi_awid),
-      .S_AXI_HP1_WID(dac_hp1_axi_wid),
-      .S_AXI_HP1_WDATA(dac_hp1_axi_wdata),
-      .S_AXI_HP1_WSTRB(dac_hp1_axi_wstrb),
+      .S_AXI_HP1_arvalid(dac_hp1_axi_arvalid),
+      .S_AXI_HP1_awvalid(dac_hp1_axi_awvalid),
+      .S_AXI_HP1_bready(dac_hp1_axi_bready),
+      .S_AXI_HP1_rready(dac_hp1_axi_rready),
+      .S_AXI_HP1_wlast(dac_hp1_axi_wlast),
+      .S_AXI_HP1_wvalid(dac_hp1_axi_wvalid),
+      .S_AXI_HP1_arburst(dac_hp1_axi_arburst),
+      .S_AXI_HP1_arlock(dac_hp1_axi_arlock),
+      .S_AXI_HP1_arsize(dac_hp1_axi_arsize),
+      .S_AXI_HP1_awburst(dac_hp1_axi_awburst),
+      .S_AXI_HP1_awlock(dac_hp1_axi_awlock),
+      .S_AXI_HP1_awsize(dac_hp1_axi_awsize),
+      .S_AXI_HP1_arprot(dac_hp1_axi_arprot),
+      .S_AXI_HP1_awprot(dac_hp1_axi_awprot),
+      .S_AXI_HP1_araddr(dac_hp1_axi_araddr),
+      .S_AXI_HP1_awaddr(dac_hp1_axi_awaddr),
+      .S_AXI_HP1_arcache(dac_hp1_axi_arcache),
+      .S_AXI_HP1_arlen(dac_hp1_axi_arlen),
+      .S_AXI_HP1_arqos(), //not used
+      .S_AXI_HP1_awcache(dac_hp1_axi_awcache),
+      .S_AXI_HP1_awlen(dac_hp1_axi_awlen),
+      .S_AXI_HP1_awqos(), //not used
+      .S_AXI_HP1_arid(dac_hp1_axi_arid),
+      .S_AXI_HP1_awid(dac_hp1_axi_awid),
+      .S_AXI_HP1_wid(dac_hp1_axi_wid),
+      .S_AXI_HP1_wdata(dac_hp1_axi_wdata),
+      .S_AXI_HP1_wstrb(dac_hp1_axi_wstrb),
       .IRQ_F2P({{2{1'b0}}, s_adc_dma_irq, s_dac_dma_irq, {12{1'b0}}}),
       .FCLK_CLK0(s_axi_clk),
       .FCLK_CLK1(s_delay_clk),
-      .FCLK_RESET1_N(), //not used
-      .MIO(fixed_io_mio),
-      .DDR_CAS_n(ddr_cas_n),
-      .DDR_CKE(ddr_cke),
-      .DDR_Clk_n(ddr_ck_n),
-      .DDR_Clk(ddr_ck_p),
-      .DDR_CS_n(ddr_cs_n),
-      .DDR_DRSTB(ddr_reset_n),
-      .DDR_ODT(ddr_odt),
-      .DDR_RAS_n(ddr_ras_n),
-      .DDR_WEB(ddr_we_n),
-      .DDR_BankAddr(ddr_ba),
-      .DDR_Addr(ddr_addr),
-      .DDR_VRN(fixed_io_ddr_vrn),
-      .DDR_VRP(fixed_io_ddr_vrp),
-      .DDR_DM(ddr_dm),
-      .DDR_DQ(ddr_dq),
-      .DDR_DQS_n(ddr_dqs_n),
-      .DDR_DQS(ddr_dqs_p),
-      .PS_SRSTB(fixed_io_ps_srstb),
-      .PS_CLK(fixed_io_ps_clk),
-      .PS_PORB(fixed_io_ps_porb),
-      .PERIPHERAL_ARESETN(s_axi_aresetn)
+      .FIXED_IO_mio(fixed_io_mio),
+      .DDR_cas_n(ddr_cas_n),
+      .DDR_cke(ddr_cke),
+      .DDR_ck_n(ddr_ck_n),
+      .DDR_ck_p(ddr_ck_p),
+      .DDR_cs_n(ddr_cs_n),
+      .DDR_reset_n(ddr_reset_n),
+      .DDR_odt(ddr_odt),
+      .DDR_ras_n(ddr_ras_n),
+      .DDR_we_n(ddr_we_n),
+      .DDR_ba(ddr_ba),
+      .DDR_addr(ddr_addr),
+      .FIXED_IO_ddr_vrn(fixed_io_ddr_vrn),
+      .FIXED_IO_ddr_vrp(fixed_io_ddr_vrp),
+      .DDR_dm(ddr_dm),
+      .DDR_dq(ddr_dq),
+      .DDR_dqs_n(ddr_dqs_n),
+      .DDR_dqs_p(ddr_dqs_p),
+      .FIXED_IO_ps_srstb(fixed_io_ps_srstb),
+      .FIXED_IO_ps_clk(fixed_io_ps_clk),
+      .FIXED_IO_ps_porb(fixed_io_ps_porb),
+      .peripheral_aresetn(s_axi_aresetn)
     );
 
 endmodule
