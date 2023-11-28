@@ -49,5 +49,5 @@ targets:
     tools:
       vivado:
         source_mgmt_mode: All
-        board_part: digilentinc.com:zedboard:part0:1.1
+        board_part: avnet.com:zedboard:1.4 #digilentinc.com:zedboard:1.1
         part: xc7z020clg484-1
