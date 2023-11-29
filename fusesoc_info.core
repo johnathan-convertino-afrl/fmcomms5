@@ -9,7 +9,7 @@ filesets:
       - common/xilinx/ad9361_pl_wrapper.v : {file_type : verilogSource}
       - common/xilinx/ad9361_pl_gen.tcl : {file_type : tclSource}
     depend:
-     - AFRL:utility:tcl_version_check:1.0.0
+     - AFRL:utility:tcl_helper_check:1.0.0
      - AFRL:utility:vivado_board_support_packages
 
   zed:
