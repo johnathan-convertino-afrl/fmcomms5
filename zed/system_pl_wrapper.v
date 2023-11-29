@@ -166,7 +166,38 @@ module system_pl_wrapper #(
     output [ 5:0]   dac_m_src_axi_awid,
     output [ 1:0]   dac_m_src_axi_awlock,
     output [ 5:0]   dac_m_src_axi_wid,
-    input  [ 5:0]   dac_m_src_axi_bid
+    input  [ 5:0]   dac_m_src_axi_bid,
+
+    //iic
+    inout           iic_sda_fmc,
+    inout           iic_scl_fmc,
+    output          iic2intc_irpt
+  );
+
+  //iic wires
+  wire sda_i;
+  wire sda_o;
+  wire sda_t;
+  wire scl_i;
+  wire scl_o;
+  wire scl_t;
+
+  ad_iobuf #(
+    .DATA_WIDTH(1)
+  ) iic_sda_iobuf (
+    .dio_t (sda_t),
+    .dio_i (sda_o),
+    .dio_o (sda_i),
+    .dio_p (iic_sda_fmc)
+  );
+
+  ad_iobuf #(
+    .DATA_WIDTH(1)
+  ) iic_scl_iobuf (
+    .dio_t (scl_t),
+    .dio_i (scl_o),
+    .dio_o (scl_i),
+    .dio_p (iic_scl_fmc)
   );
 
   ad9361_pl_wrapper #(
@@ -309,7 +340,16 @@ module system_pl_wrapper #(
     .dac_m_src_axi_awid(dac_m_src_axi_awid),
     .dac_m_src_axi_awlock(dac_m_src_axi_awlock),
     .dac_m_src_axi_wid(dac_m_src_axi_wid),
-    .dac_m_src_axi_bid(dac_m_src_axi_bid)
+    .dac_m_src_axi_bid(dac_m_src_axi_bid),
+
+    //iic
+    .sda_i(sda_i),
+    .sda_o(sda_o),
+    .sda_t(sda_t),
+    .scl_i(scl_i),
+    .scl_o(scl_o),
+    .scl_t(scl_t),
+    .iic2intc_irpt(iic2intc_irpt)
   );
 
 endmodule

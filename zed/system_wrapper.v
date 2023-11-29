@@ -59,6 +59,9 @@ module system_wrapper #(
     inout                   fixed_io_ps_porb,
     inout                   fixed_io_ps_srstb,
 
+    inout                   iic_scl_fmc,
+    inout                   iic_sda_fmc,
+
     inout       [31:0]      gpio_bd,
 
     input                   otg_vbusoc,
@@ -106,11 +109,12 @@ module system_wrapper #(
 
   //PS TO PL / PL TO PS signals
 
-  wire            s_delay_clk;
-  wire            s_axi_clk;
-  wire            s_axi_aresetn;
-  wire            s_adc_dma_irq;
-  wire            s_dac_dma_irq;
+  wire        s_delay_clk;
+  wire        s_axi_clk;
+  wire        s_axi_aresetn;
+  wire        s_adc_dma_irq;
+  wire        s_dac_dma_irq;
+  wire        s_iic2intc_irpt;
 
   //axi gp0
   wire        w_axi_awvalid;
@@ -369,7 +373,11 @@ module system_wrapper #(
     .dac_m_src_axi_awid(dac_hp1_axi_awid),
     .dac_m_src_axi_awlock(dac_hp1_axi_awlock),
     .dac_m_src_axi_wid(dac_hp1_axi_wid),
-    .dac_m_src_axi_bid(dac_hp1_axi_bid)
+    .dac_m_src_axi_bid(dac_hp1_axi_bid),
+
+    .iic_scl_fmc(iic_scl_fmc),
+    .iic_sda_fmc(iic_sda_fmc),
+    .iic2intc_irpt(s_iic2intc_irpt)
   );
 
   system_ps_wrapper inst_system_ps_wrapper
@@ -511,7 +519,7 @@ module system_wrapper #(
       .S_AXI_HP1_wid(dac_hp1_axi_wid),
       .S_AXI_HP1_wdata(dac_hp1_axi_wdata),
       .S_AXI_HP1_wstrb(dac_hp1_axi_wstrb),
-      .IRQ_F2P({{2{1'b0}}, s_adc_dma_irq, s_dac_dma_irq, {12{1'b0}}}),
+      .IRQ_F2P({{2{1'b0}}, s_adc_dma_irq, s_dac_dma_irq, s_iic2intc_irpt, {11{1'b0}}}),
       .FCLK_CLK0(s_axi_clk),
       .FCLK_CLK1(s_delay_clk),
       .FIXED_IO_mio(fixed_io_mio),
