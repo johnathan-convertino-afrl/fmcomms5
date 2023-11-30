@@ -402,45 +402,25 @@ module system_wrapper #(
       .SPI1_SS1_O(spi_udc_csn_rx),
       .SPI1_SS2_O(), //not used
       .USB0_vbus_pwrfault(~otg_vbusoc),
-      .M_AXI_GP0_arvalid(w_axi_arvalid),
-      .M_AXI_GP0_awvalid(w_axi_awvalid),
-      .M_AXI_GP0_bready(w_axi_bready),
-      .M_AXI_GP0_rready(w_axi_rready),
-      .M_AXI_GP0_wlast(), //not used
-      .M_AXI_GP0_wvalid(w_axi_wvalid),
-      .M_AXI_GP0_arid(), //not used
-      .M_AXI_GP0_awid(), //not used
-      .M_AXI_GP0_wid(),  //not used
-      .M_AXI_GP0_arburst(), //not used
-      .M_AXI_GP0_arlock(),  //not used
-      .M_AXI_GP0_arsize(),  //not used
-      .M_AXI_GP0_awburst(), //not used
-      .M_AXI_GP0_awlock(),  //not used
-      .M_AXI_GP0_awsize(),  //not used
-      .M_AXI_GP0_arprot(w_axi_arprot),
-      .M_AXI_GP0_awprot(w_axi_awprot),
-      .M_AXI_GP0_araddr(w_axi_araddr),
-      .M_AXI_GP0_awaddr(w_axi_awaddr),
-      .M_AXI_GP0_wdata(w_axi_wdata),
-      .M_AXI_GP0_arcache(), //not used
-      .M_AXI_GP0_arlen(),   //not used
-      .M_AXI_GP0_arqos(),   //not used
-      .M_AXI_GP0_awcache(), //not used
-      .M_AXI_GP0_awlen(),   //not used
-      .M_AXI_GP0_awqos(),   //not used
-      .M_AXI_GP0_wstrb(w_axi_wstrb),
-      .M_AXI_GP0_ACLK(s_axi_clk),
-      .M_AXI_GP0_arready(w_axi_arready),
-      .M_AXI_GP0_awready(w_axi_awready),
-      .M_AXI_GP0_bvalid(w_axi_bvalid),
-      .M_AXI_GP0_rlast(1'b0),  //not used
-      .M_AXI_GP0_rvalid(w_axi_rvalid),
-      .M_AXI_GP0_wready(w_axi_wready),
-      .M_AXI_GP0_bid({11{1'b0}}),    //not used
-      .M_AXI_GP0_rid({11{1'b0}}),    //not used
-      .M_AXI_GP0_bresp(w_axi_bresp),
-      .M_AXI_GP0_rresp(w_axi_rresp),
-      .M_AXI_GP0_rdata(w_axi_rdata),
+      .M_AXI_araddr(w_axi_araddr),
+      .M_AXI_arprot(w_axi_arprot),
+      .M_AXI_arready(w_axi_arready),
+      .M_AXI_arvalid(w_axi_arvalid),
+      .M_AXI_awaddr(w_axi_awaddr),
+      .M_AXI_awprot(w_axi_awprot),
+      .M_AXI_awready(w_axi_awready),
+      .M_AXI_awvalid(w_axi_awvalid),
+      .M_AXI_bready(w_axi_bready),
+      .M_AXI_bresp(w_axi_bresp),
+      .M_AXI_bvalid(w_axi_bvalid),
+      .M_AXI_rdata(w_axi_rdata),
+      .M_AXI_rready(w_axi_rready),
+      .M_AXI_rresp(w_axi_rresp),
+      .M_AXI_rvalid(w_axi_rvalid),
+      .M_AXI_wdata(w_axi_wdata),
+      .M_AXI_wready(w_axi_wready),
+      .M_AXI_wstrb(w_axi_wstrb),
+      .M_AXI_wvalid(w_axi_wvalid),
       .S_AXI_HP0_arready(adc_hp0_axi_arready),
       .S_AXI_HP0_awready(adc_hp0_axi_awready),
       .S_AXI_HP0_bvalid(adc_hp0_axi_bvalid),
