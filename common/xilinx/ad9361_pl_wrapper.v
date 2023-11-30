@@ -533,7 +533,7 @@ module ad9361_pl_wrapper #(
     .AXI_SLICE_SRC(0),
     .SYNC_TRANSFER_START(1),
     .CYCLIC(0),
-    .DMA_AXI_PROTOCOL_DEST(1),
+    .DMA_AXI_PROTOCOL_DEST(1), //1 = AXI3, 0 = AXI4
     .DMA_AXI_PROTOCOL_SRC(1),
     .DMA_TYPE_DEST(0),
     .DMA_TYPE_SRC(2),
@@ -730,7 +730,7 @@ module ad9361_pl_wrapper #(
     .SYNC_TRANSFER_START(0),
     .CYCLIC(1),
     .DMA_AXI_PROTOCOL_DEST(1),
-    .DMA_AXI_PROTOCOL_SRC(1),
+    .DMA_AXI_PROTOCOL_SRC(1), //1 = AXI3, 0 = AXI4
     .DMA_TYPE_DEST(1),
     .DMA_TYPE_SRC(0),
     .DMA_AXI_ADDR_WIDTH(32),
