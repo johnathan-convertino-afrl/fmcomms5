@@ -26,7 +26,6 @@
 ///  IN THE SOFTWARE.
 //******************************************************************************
 
-//copy-pasta inout from analog device system_top.v zed
 module system_wrapper #(
     parameter FPGA_TECHNOLOGY = 1,
     parameter FPGA_FAMILY = 4,
