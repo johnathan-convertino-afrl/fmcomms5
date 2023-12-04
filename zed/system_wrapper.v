@@ -146,35 +146,14 @@ module system_wrapper #(
   wire [ 3:0]   adc_hp0_axi_awcache;
   wire          adc_hp0_axi_awvalid;
   wire          adc_hp0_axi_awready;
-  wire [ 5:0]   adc_hp0_axi_awid;
-  wire [ 1:0]   adc_hp0_axi_awlock;
   wire [63:0]   adc_hp0_axi_wdata;
   wire [ 7:0]   adc_hp0_axi_wstrb;
   wire          adc_hp0_axi_wready;
   wire          adc_hp0_axi_wvalid;
   wire          adc_hp0_axi_wlast;
-  wire [ 5:0]   adc_hp0_axi_wid;
   wire          adc_hp0_axi_bvalid;
   wire [ 1:0]   adc_hp0_axi_bresp;
   wire          adc_hp0_axi_bready;
-  wire [ 5:0]   adc_hp0_axi_bid;
-  // Unused read interface
-  wire          adc_hp0_axi_arvalid;
-  wire [31:0]   adc_hp0_axi_araddr;
-  wire [ 3:0]   adc_hp0_axi_arlen;
-  wire [ 2:0]   adc_hp0_axi_arsize;
-  wire [ 1:0]   adc_hp0_axi_arburst;
-  wire [ 3:0]   adc_hp0_axi_arcache;
-  wire [ 2:0]   adc_hp0_axi_arprot;
-  wire          adc_hp0_axi_arready;
-  wire          adc_hp0_axi_rvalid;
-  wire [ 1:0]   adc_hp0_axi_rresp;
-  wire [63:0]   adc_hp0_axi_rdata;
-  wire          adc_hp0_axi_rready;
-  wire [ 5:0]   adc_hp0_axi_arid;
-  wire [ 1:0]   adc_hp0_axi_arlock;
-  wire [ 5:0]   adc_hp0_axi_rid;
-  wire          adc_hp0_axi_rlast;
 
   //axi interface for dac to the hp1 interface
   wire          dac_hp1_axi_arready;
@@ -185,35 +164,11 @@ module system_wrapper #(
   wire [ 1:0]   dac_hp1_axi_arburst;
   wire [ 2:0]   dac_hp1_axi_arprot;
   wire [ 3:0]   dac_hp1_axi_arcache;
-  wire [ 5:0]   dac_hp1_axi_arid;
-  wire [ 1:0]   dac_hp1_axi_arlock;
   wire [63:0]   dac_hp1_axi_rdata;
   wire          dac_hp1_axi_rready;
   wire          dac_hp1_axi_rvalid;
   wire [ 1:0]   dac_hp1_axi_rresp;
-  wire [ 5:0]   dac_hp1_axi_rid;
   wire          dac_hp1_axi_rlast;
-  // Unused write interface
-  wire          dac_hp1_axi_awvalid;
-  wire [31:0]   dac_hp1_axi_awaddr;
-  wire [ 3:0]   dac_hp1_axi_awlen;
-  wire [ 2:0]   dac_hp1_axi_awsize;
-  wire [ 1:0]   dac_hp1_axi_awburst;
-  wire [ 3:0]   dac_hp1_axi_awcache;
-  wire [ 2:0]   dac_hp1_axi_awprot;
-  wire          dac_hp1_axi_awready;
-  wire          dac_hp1_axi_wvalid;
-  wire [63:0]   dac_hp1_axi_wdata;
-  wire [ 7:0]   dac_hp1_axi_wstrb;
-  wire          dac_hp1_axi_wlast;
-  wire          dac_hp1_axi_wready;
-  wire          dac_hp1_axi_bvalid;
-  wire [ 1:0]   dac_hp1_axi_bresp;
-  wire          dac_hp1_axi_bready;
-  wire [ 5:0]   dac_hp1_axi_awid;
-  wire [ 1:0]   dac_hp1_axi_awlock;
-  wire [ 5:0]   dac_hp1_axi_wid;
-  wire [ 5:0]   dac_hp1_axi_bid;
 
   // instantiations... copy pasta
 
@@ -306,35 +261,14 @@ module system_wrapper #(
     .adc_m_dest_axi_awcache(adc_hp0_axi_awcache),
     .adc_m_dest_axi_awvalid(adc_hp0_axi_awvalid),
     .adc_m_dest_axi_awready(adc_hp0_axi_awready),
-    .adc_m_dest_axi_awid(adc_hp0_axi_awid),
-    .adc_m_dest_axi_awlock(adc_hp0_axi_awlock),
     .adc_m_dest_axi_wdata(adc_hp0_axi_wdata),
     .adc_m_dest_axi_wstrb(adc_hp0_axi_wstrb),
     .adc_m_dest_axi_wready(adc_hp0_axi_wready),
     .adc_m_dest_axi_wvalid(adc_hp0_axi_wvalid),
     .adc_m_dest_axi_wlast(adc_hp0_axi_wlast),
-    .adc_m_dest_axi_wid(adc_hp0_axi_wid),
     .adc_m_dest_axi_bvalid(adc_hp0_axi_bvalid),
     .adc_m_dest_axi_bresp(adc_hp0_axi_bresp),
     .adc_m_dest_axi_bready(adc_hp0_axi_bready),
-    .adc_m_dest_axi_bid(adc_hp0_axi_bid),
-    // Unused read interface
-    .adc_m_dest_axi_arvalid(adc_hp0_axi_arvalid),
-    .adc_m_dest_axi_araddr(adc_hp0_axi_araddr),
-    .adc_m_dest_axi_arlen(adc_hp0_axi_arlen),
-    .adc_m_dest_axi_arsize(adc_hp0_axi_arsize),
-    .adc_m_dest_axi_arburst(adc_hp0_axi_arburst),
-    .adc_m_dest_axi_arcache(adc_hp0_axi_arcache),
-    .adc_m_dest_axi_arprot(adc_hp0_axi_arprot),
-    .adc_m_dest_axi_arready(adc_hp0_axi_arready),
-    .adc_m_dest_axi_rvalid(adc_hp0_axi_rvalid),
-    .adc_m_dest_axi_rresp(adc_hp0_axi_rresp),
-    .adc_m_dest_axi_rdata(adc_hp0_axi_rdata),
-    .adc_m_dest_axi_rready(adc_hp0_axi_rready),
-    .adc_m_dest_axi_arid(adc_hp0_axi_arid),
-    .adc_m_dest_axi_arlock(adc_hp0_axi_arlock),
-    .adc_m_dest_axi_rid(adc_hp0_axi_rid),
-    .adc_m_dest_axi_rlast(adc_hp0_axi_rlast),
 
     //axi interface for dac to the hp interface
     .dac_m_src_axi_arready(dac_hp1_axi_arready),
@@ -345,35 +279,11 @@ module system_wrapper #(
     .dac_m_src_axi_arburst(dac_hp1_axi_arburst),
     .dac_m_src_axi_arprot(dac_hp1_axi_arprot),
     .dac_m_src_axi_arcache(dac_hp1_axi_arcache),
-    .dac_m_src_axi_arid(dac_hp1_axi_arid),
-    .dac_m_src_axi_arlock(dac_hp1_axi_arlock),
     .dac_m_src_axi_rdata(dac_hp1_axi_rdata),
     .dac_m_src_axi_rready(dac_hp1_axi_rready),
     .dac_m_src_axi_rvalid(dac_hp1_axi_rvalid),
     .dac_m_src_axi_rresp(dac_hp1_axi_rresp),
-    .dac_m_src_axi_rid(dac_hp1_axi_rid),
     .dac_m_src_axi_rlast(dac_hp1_axi_rlast),
-    // Unused write interface
-    .dac_m_src_axi_awvalid(dac_hp1_axi_awvalid),
-    .dac_m_src_axi_awaddr(dac_hp1_axi_awaddr),
-    .dac_m_src_axi_awlen(dac_hp1_axi_awlen),
-    .dac_m_src_axi_awsize(dac_hp1_axi_awsize),
-    .dac_m_src_axi_awburst(dac_hp1_axi_awburst),
-    .dac_m_src_axi_awcache(dac_hp1_axi_awcache),
-    .dac_m_src_axi_awprot(dac_hp1_axi_awprot),
-    .dac_m_src_axi_awready(dac_hp1_axi_awready),
-    .dac_m_src_axi_wvalid(dac_hp1_axi_wvalid),
-    .dac_m_src_axi_wdata(dac_hp1_axi_wdata),
-    .dac_m_src_axi_wstrb(dac_hp1_axi_wstrb),
-    .dac_m_src_axi_wlast(dac_hp1_axi_wlast),
-    .dac_m_src_axi_wready(dac_hp1_axi_wready),
-    .dac_m_src_axi_bvalid(dac_hp1_axi_bvalid),
-    .dac_m_src_axi_bresp(dac_hp1_axi_bresp),
-    .dac_m_src_axi_bready(dac_hp1_axi_bready),
-    .dac_m_src_axi_awid(dac_hp1_axi_awid),
-    .dac_m_src_axi_awlock(dac_hp1_axi_awlock),
-    .dac_m_src_axi_wid(dac_hp1_axi_wid),
-    .dac_m_src_axi_bid(dac_hp1_axi_bid),
 
     .iic_scl_fmc(iic_scl_fmc),
     .iic_sda_fmc(iic_sda_fmc),
@@ -400,7 +310,7 @@ module system_wrapper #(
       .SPI1_SS_I(1'b1),
       .SPI1_SS_O(spi_udc_csn_tx),
       .SPI1_SS1_O(spi_udc_csn_rx),
-      .SPI1_SS2_O(), //not used
+      .SPI1_SS2_O(),
       .USB0_vbus_pwrfault(~otg_vbusoc),
       .M_AXI_araddr(w_axi_araddr),
       .M_AXI_arprot(w_axi_arprot),
@@ -421,84 +331,85 @@ module system_wrapper #(
       .M_AXI_wready(w_axi_wready),
       .M_AXI_wstrb(w_axi_wstrb),
       .M_AXI_wvalid(w_axi_wvalid),
-      .S_AXI_HP0_arready(adc_hp0_axi_arready),
+
+      .S_AXI_HP0_arready(),
       .S_AXI_HP0_awready(adc_hp0_axi_awready),
       .S_AXI_HP0_bvalid(adc_hp0_axi_bvalid),
-      .S_AXI_HP0_rlast(adc_hp0_axi_rlast),
-      .S_AXI_HP0_rvalid(adc_hp0_axi_rvalid),
+      .S_AXI_HP0_rlast(),
+      .S_AXI_HP0_rvalid(),
       .S_AXI_HP0_wready(adc_hp0_axi_wready),
       .S_AXI_HP0_bresp(adc_hp0_axi_bresp),
-      .S_AXI_HP0_rresp(adc_hp0_axi_rresp),
-      .S_AXI_HP0_bid(adc_hp0_axi_bid),
-      .S_AXI_HP0_rid(adc_hp0_axi_rid),
-      .S_AXI_HP0_rdata(adc_hp0_axi_rdata),
+      .S_AXI_HP0_rresp(),
+      .S_AXI_HP0_bid(),
+      .S_AXI_HP0_rid(),
+      .S_AXI_HP0_rdata(),
       .S_AXI_HP0_ACLK(s_axi_clk),
-      .S_AXI_HP0_arvalid(adc_hp0_axi_arvalid),
-      .S_AXI_HP0_awvalid(adc_hp0_axi_wvalid),
+      .S_AXI_HP0_arvalid(1'b0),
+      .S_AXI_HP0_awvalid(adc_hp0_axi_awvalid),
       .S_AXI_HP0_bready(adc_hp0_axi_bready),
-      .S_AXI_HP0_rready(adc_hp0_axi_rready),
+      .S_AXI_HP0_rready(1'b0),
       .S_AXI_HP0_wlast(adc_hp0_axi_wlast),
       .S_AXI_HP0_wvalid(adc_hp0_axi_wvalid),
-      .S_AXI_HP0_arburst(adc_hp0_axi_arburst),
-      .S_AXI_HP0_arlock(adc_hp0_axi_arlock),
-      .S_AXI_HP0_arsize(adc_hp0_axi_arsize),
+      .S_AXI_HP0_arburst(2'b01),
+      .S_AXI_HP0_arlock(0),
+      .S_AXI_HP0_arsize(3'b011),
       .S_AXI_HP0_awburst(adc_hp0_axi_awburst),
-      .S_AXI_HP0_awlock(adc_hp0_axi_awlock),
+      .S_AXI_HP0_awlock(0),
       .S_AXI_HP0_awsize(adc_hp0_axi_awsize),
-      .S_AXI_HP0_arprot(adc_hp0_axi_arprot),
+      .S_AXI_HP0_arprot(0),
       .S_AXI_HP0_awprot(adc_hp0_axi_awprot),
-      .S_AXI_HP0_araddr(adc_hp0_axi_araddr),
+      .S_AXI_HP0_araddr(0),
       .S_AXI_HP0_awaddr(adc_hp0_axi_awaddr),
-      .S_AXI_HP0_arcache(adc_hp0_axi_arcache),
-      .S_AXI_HP0_arlen(adc_hp0_axi_arlen),
-      .S_AXI_HP0_arqos(), //not used
+      .S_AXI_HP0_arcache(4'b0011),
+      .S_AXI_HP0_arlen(0),
+      .S_AXI_HP0_arqos(0),
       .S_AXI_HP0_awcache(adc_hp0_axi_awcache),
       .S_AXI_HP0_awlen(adc_hp0_axi_awlen),
-      .S_AXI_HP0_awqos(), //not used
-      .S_AXI_HP0_arid(adc_hp0_axi_arid),
-      .S_AXI_HP0_awid(adc_hp0_axi_awid),
-      .S_AXI_HP0_wid(adc_hp0_axi_wid),
+      .S_AXI_HP0_awqos(0),
+      .S_AXI_HP0_arid(0),
+      .S_AXI_HP0_awid(0),
+      .S_AXI_HP0_wid(0),
       .S_AXI_HP0_wdata(adc_hp0_axi_wdata),
       .S_AXI_HP0_wstrb(adc_hp0_axi_wstrb),
       .S_AXI_HP1_arready(dac_hp1_axi_arready),
-      .S_AXI_HP1_awready(dac_hp1_axi_awready),
-      .S_AXI_HP1_bvalid(dac_hp1_axi_bvalid),
+      .S_AXI_HP1_awready(),
+      .S_AXI_HP1_bvalid(),
       .S_AXI_HP1_rlast(dac_hp1_axi_rlast),
       .S_AXI_HP1_rvalid(dac_hp1_axi_rvalid),
-      .S_AXI_HP1_wready(dac_hp1_axi_wready),
-      .S_AXI_HP1_bresp(dac_hp1_axi_bresp),
+      .S_AXI_HP1_wready(),
+      .S_AXI_HP1_bresp(),
       .S_AXI_HP1_rresp(dac_hp1_axi_rresp),
-      .S_AXI_HP1_bid(dac_hp1_axi_bid),
-      .S_AXI_HP1_rid(dac_hp1_axi_rid),
+      .S_AXI_HP1_bid(),
+      .S_AXI_HP1_rid(),
       .S_AXI_HP1_rdata(dac_hp1_axi_rdata),
       .S_AXI_HP1_ACLK(s_axi_clk),
       .S_AXI_HP1_arvalid(dac_hp1_axi_arvalid),
-      .S_AXI_HP1_awvalid(dac_hp1_axi_awvalid),
-      .S_AXI_HP1_bready(dac_hp1_axi_bready),
+      .S_AXI_HP1_awvalid(1'b0),
+      .S_AXI_HP1_bready(1'b0),
       .S_AXI_HP1_rready(dac_hp1_axi_rready),
-      .S_AXI_HP1_wlast(dac_hp1_axi_wlast),
-      .S_AXI_HP1_wvalid(dac_hp1_axi_wvalid),
+      .S_AXI_HP1_wlast(1'b0),
+      .S_AXI_HP1_wvalid(1'b0),
       .S_AXI_HP1_arburst(dac_hp1_axi_arburst),
-      .S_AXI_HP1_arlock(dac_hp1_axi_arlock),
+      .S_AXI_HP1_arlock(0),
       .S_AXI_HP1_arsize(dac_hp1_axi_arsize),
-      .S_AXI_HP1_awburst(dac_hp1_axi_awburst),
-      .S_AXI_HP1_awlock(dac_hp1_axi_awlock),
-      .S_AXI_HP1_awsize(dac_hp1_axi_awsize),
+      .S_AXI_HP1_awburst(2'b01),
+      .S_AXI_HP1_awlock(0),
+      .S_AXI_HP1_awsize(3'b011),
       .S_AXI_HP1_arprot(dac_hp1_axi_arprot),
-      .S_AXI_HP1_awprot(dac_hp1_axi_awprot),
+      .S_AXI_HP1_awprot(0),
       .S_AXI_HP1_araddr(dac_hp1_axi_araddr),
-      .S_AXI_HP1_awaddr(dac_hp1_axi_awaddr),
+      .S_AXI_HP1_awaddr(0),
       .S_AXI_HP1_arcache(dac_hp1_axi_arcache),
       .S_AXI_HP1_arlen(dac_hp1_axi_arlen),
-      .S_AXI_HP1_arqos(), //not used
-      .S_AXI_HP1_awcache(dac_hp1_axi_awcache),
-      .S_AXI_HP1_awlen(dac_hp1_axi_awlen),
-      .S_AXI_HP1_awqos(), //not used
-      .S_AXI_HP1_arid(dac_hp1_axi_arid),
-      .S_AXI_HP1_awid(dac_hp1_axi_awid),
-      .S_AXI_HP1_wid(dac_hp1_axi_wid),
-      .S_AXI_HP1_wdata(dac_hp1_axi_wdata),
-      .S_AXI_HP1_wstrb(dac_hp1_axi_wstrb),
+      .S_AXI_HP1_arqos(0),
+      .S_AXI_HP1_awcache(4'b0011),
+      .S_AXI_HP1_awlen(0),
+      .S_AXI_HP1_awqos(0),
+      .S_AXI_HP1_arid(0),
+      .S_AXI_HP1_awid(0),
+      .S_AXI_HP1_wid(0),
+      .S_AXI_HP1_wdata(0),
+      .S_AXI_HP1_wstrb(~0),
       .IRQ_F2P({{2{1'b0}}, s_adc_dma_irq, s_dac_dma_irq, s_iic2intc_irpt, {11{1'b0}}}),
       .FCLK_CLK0(s_axi_clk),
       .FCLK_CLK1(s_delay_clk),

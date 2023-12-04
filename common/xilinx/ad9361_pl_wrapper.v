@@ -99,35 +99,14 @@ module ad9361_pl_wrapper #(
     output [ 3:0]   adc_m_dest_axi_awcache,
     output          adc_m_dest_axi_awvalid,
     input           adc_m_dest_axi_awready,
-    output [ 5:0]   adc_m_dest_axi_awid,
-    output [ 1:0]   adc_m_dest_axi_awlock,
     output [63:0]   adc_m_dest_axi_wdata,
     output [ 7:0]   adc_m_dest_axi_wstrb,
     input           adc_m_dest_axi_wready,
     output          adc_m_dest_axi_wvalid,
     output          adc_m_dest_axi_wlast,
-    output [ 5:0]   adc_m_dest_axi_wid,
     input           adc_m_dest_axi_bvalid,
     input  [ 1:0]   adc_m_dest_axi_bresp,
     output          adc_m_dest_axi_bready,
-    input  [ 5:0]   adc_m_dest_axi_bid,
-    // Unused read interface
-    output          adc_m_dest_axi_arvalid,
-    output [31:0]   adc_m_dest_axi_araddr,
-    output [ 3:0]   adc_m_dest_axi_arlen,
-    output [ 2:0]   adc_m_dest_axi_arsize,
-    output [ 1:0]   adc_m_dest_axi_arburst,
-    output [ 3:0]   adc_m_dest_axi_arcache,
-    output [ 2:0]   adc_m_dest_axi_arprot,
-    input           adc_m_dest_axi_arready,
-    input           adc_m_dest_axi_rvalid,
-    input  [ 1:0]   adc_m_dest_axi_rresp,
-    input  [63:0]   adc_m_dest_axi_rdata,
-    output          adc_m_dest_axi_rready,
-    output [ 5:0]   adc_m_dest_axi_arid,
-    output [ 1:0]   adc_m_dest_axi_arlock,
-    input  [ 5:0]   adc_m_dest_axi_rid,
-    input           adc_m_dest_axi_rlast,
 
     //axi interface for dac to the hp interface
     input           dac_m_src_axi_arready,
@@ -138,35 +117,12 @@ module ad9361_pl_wrapper #(
     output [ 1:0]   dac_m_src_axi_arburst,
     output [ 2:0]   dac_m_src_axi_arprot,
     output [ 3:0]   dac_m_src_axi_arcache,
-    output [ 5:0]   dac_m_src_axi_arid,
-    output [ 1:0]   dac_m_src_axi_arlock,
     input  [63:0]   dac_m_src_axi_rdata,
     output          dac_m_src_axi_rready,
     input           dac_m_src_axi_rvalid,
     input  [ 1:0]   dac_m_src_axi_rresp,
-    input  [ 5:0]   dac_m_src_axi_rid,
     input           dac_m_src_axi_rlast,
-    // Unused write interface
-    output          dac_m_src_axi_awvalid,
-    output [31:0]   dac_m_src_axi_awaddr,
-    output [ 3:0]   dac_m_src_axi_awlen,
-    output [ 2:0]   dac_m_src_axi_awsize,
-    output [ 1:0]   dac_m_src_axi_awburst,
-    output [ 3:0]   dac_m_src_axi_awcache,
-    output [ 2:0]   dac_m_src_axi_awprot,
-    input           dac_m_src_axi_awready,
-    output          dac_m_src_axi_wvalid,
-    output [63:0]   dac_m_src_axi_wdata,
-    output [ 7:0]   dac_m_src_axi_wstrb,
-    output          dac_m_src_axi_wlast,
-    input           dac_m_src_axi_wready,
-    input           dac_m_src_axi_bvalid,
-    input  [ 1:0]   dac_m_src_axi_bresp,
-    output          dac_m_src_axi_bready,
-    output [ 5:0]   dac_m_src_axi_awid,
-    output [ 1:0]   dac_m_src_axi_awlock,
-    output [ 5:0]   dac_m_src_axi_wid,
-    input  [ 5:0]   dac_m_src_axi_bid,
+
 
     //i2c
     input           sda_i,
@@ -324,7 +280,7 @@ module ad9361_pl_wrapper #(
   wire  [63:0]   fifo_s_axis_data;
 
   //iic fmc
-  wire  [ 8:0]  iic_fmc_axi_awaddr;
+  wire  [31:0]  iic_fmc_axi_awaddr;
   wire          iic_fmc_axi_awvalid;
   wire          iic_fmc_axi_awready;
   wire  [31:0]  iic_fmc_axi_wdata;
@@ -334,7 +290,7 @@ module ad9361_pl_wrapper #(
   wire  [ 1:0]  iic_fmc_axi_bresp;
   wire          iic_fmc_axi_bvalid;
   wire          iic_fmc_axi_bready;
-  wire  [ 8:0]  iic_fmc_axi_araddr;
+  wire  [31:0]  iic_fmc_axi_araddr;
   wire          iic_fmc_axi_arvalid;
   wire          iic_fmc_axi_arready;
   wire  [31:0]  iic_fmc_axi_rdata;
@@ -589,8 +545,8 @@ module ad9361_pl_wrapper #(
     .m_dest_axi_awcache(adc_m_dest_axi_awcache),
     .m_dest_axi_awvalid(adc_m_dest_axi_awvalid),
     .m_dest_axi_awready(adc_m_dest_axi_awready),
-    .m_dest_axi_awid(adc_m_dest_axi_awid),
-    .m_dest_axi_awlock(adc_m_dest_axi_awlock),
+    .m_dest_axi_awid(),
+    .m_dest_axi_awlock(),
 
     // Write data
     .m_dest_axi_wdata(adc_m_dest_axi_wdata),
@@ -598,31 +554,31 @@ module ad9361_pl_wrapper #(
     .m_dest_axi_wready(adc_m_dest_axi_wready),
     .m_dest_axi_wvalid(adc_m_dest_axi_wvalid),
     .m_dest_axi_wlast(adc_m_dest_axi_wlast),
-    .m_dest_axi_wid(adc_m_dest_axi_wid),
+    .m_dest_axi_wid(),
 
     // Write response
     .m_dest_axi_bvalid(adc_m_dest_axi_bvalid),
     .m_dest_axi_bresp(adc_m_dest_axi_bresp),
     .m_dest_axi_bready(adc_m_dest_axi_bready),
-    .m_dest_axi_bid(adc_m_dest_axi_bid),
+    .m_dest_axi_bid(1'b0),
 
     // Unused read interface
-    .m_dest_axi_arvalid(adc_m_dest_axi_arvalid),
-    .m_dest_axi_araddr(adc_m_dest_axi_araddr),
-    .m_dest_axi_arlen(adc_m_dest_axi_arlen),
-    .m_dest_axi_arsize(adc_m_dest_axi_arsize),
-    .m_dest_axi_arburst(adc_m_dest_axi_arburst),
-    .m_dest_axi_arcache(adc_m_dest_axi_arcache),
-    .m_dest_axi_arprot(adc_m_dest_axi_arprot),
-    .m_dest_axi_arready(adc_m_dest_axi_arready),
-    .m_dest_axi_rvalid(adc_m_dest_axi_rvalid),
-    .m_dest_axi_rresp(adc_m_dest_axi_rresp),
-    .m_dest_axi_rdata(adc_m_dest_axi_rdata),
-    .m_dest_axi_rready(adc_m_dest_axi_rready),
-    .m_dest_axi_arid(adc_m_dest_axi_arid),
-    .m_dest_axi_arlock(adc_m_dest_axi_arlock),
-    .m_dest_axi_rid(adc_m_dest_axi_rid),
-    .m_dest_axi_rlast(adc_m_dest_axi_rlast),
+    .m_dest_axi_arvalid(),
+    .m_dest_axi_araddr(),
+    .m_dest_axi_arlen(),
+    .m_dest_axi_arsize(),
+    .m_dest_axi_arburst(),
+    .m_dest_axi_arcache(),
+    .m_dest_axi_arprot(),
+    .m_dest_axi_arready(1'b0),
+    .m_dest_axi_rvalid(1'b0),
+    .m_dest_axi_rresp(0),
+    .m_dest_axi_rdata(0),
+    .m_dest_axi_rready(),
+    .m_dest_axi_arid(),
+    .m_dest_axi_arlock(),
+    .m_dest_axi_rid(1'b0),
+    .m_dest_axi_rlast(1'b0),
 
     // Master AXI interface
     .m_src_axi_aclk(1'b0),
@@ -668,7 +624,7 @@ module ad9361_pl_wrapper #(
     .m_src_axi_awid(),
     .m_src_axi_awlock(),
     .m_src_axi_wid(),
-    .m_src_axi_bid(),
+    .m_src_axi_bid(1'b0),
 
     // Slave streaming AXI interface
     .s_axis_aclk(1'b0),
@@ -677,7 +633,7 @@ module ad9361_pl_wrapper #(
     .s_axis_data(0),
     .s_axis_strb(0),
     .s_axis_keep(0),
-    .s_axis_user(0),
+    .s_axis_user(1'b1),
     .s_axis_id(0),
     .s_axis_dest(0),
     .s_axis_last(1'b0),
@@ -832,38 +788,38 @@ module ad9361_pl_wrapper #(
     .m_src_axi_arburst(dac_m_src_axi_arburst),
     .m_src_axi_arprot(dac_m_src_axi_arprot),
     .m_src_axi_arcache(dac_m_src_axi_arcache),
-    .m_src_axi_arid(dac_m_src_axi_arid),
-    .m_src_axi_arlock(dac_m_src_axi_arlock),
+    .m_src_axi_arid(),        //not connected in gen
+    .m_src_axi_arlock(),    //not connected in gen
 
     // Read data and response
     .m_src_axi_rdata(dac_m_src_axi_rdata),
     .m_src_axi_rready(dac_m_src_axi_rready),
     .m_src_axi_rvalid(dac_m_src_axi_rvalid),
     .m_src_axi_rresp(dac_m_src_axi_rresp),
-    .m_src_axi_rid(dac_m_src_axi_rid),
+    .m_src_axi_rid(1'b0),        //1'b0?
     .m_src_axi_rlast(dac_m_src_axi_rlast),
 
     // Unused write interface
-    .m_src_axi_awvalid(dac_m_src_axi_awvalid),
-    .m_src_axi_awaddr(dac_m_src_axi_awaddr),
-    .m_src_axi_awlen(dac_m_src_axi_awlen),
-    .m_src_axi_awsize(dac_m_src_axi_awsize),
-    .m_src_axi_awburst(dac_m_src_axi_awburst),
-    .m_src_axi_awcache(dac_m_src_axi_awcache),
-    .m_src_axi_awprot(dac_m_src_axi_awprot),
-    .m_src_axi_awready(dac_m_src_axi_awready),
-    .m_src_axi_wvalid(dac_m_src_axi_wvalid),
-    .m_src_axi_wdata(dac_m_src_axi_wdata),
-    .m_src_axi_wstrb(dac_m_src_axi_wstrb),
-    .m_src_axi_wlast(dac_m_src_axi_wlast),
-    .m_src_axi_wready(dac_m_src_axi_wready),
-    .m_src_axi_bvalid(dac_m_src_axi_bvalid),
-    .m_src_axi_bresp(dac_m_src_axi_bresp),
-    .m_src_axi_bready(dac_m_src_axi_bready),
-    .m_src_axi_awid(dac_m_src_axi_awid),
-    .m_src_axi_awlock(dac_m_src_axi_awlock),
-    .m_src_axi_wid(dac_m_src_axi_wid),
-    .m_src_axi_bid(dac_m_src_axi_bid),
+    .m_src_axi_awvalid(),
+    .m_src_axi_awaddr(),
+    .m_src_axi_awlen(),
+    .m_src_axi_awsize(),
+    .m_src_axi_awburst(),
+    .m_src_axi_awcache(),
+    .m_src_axi_awprot(),
+    .m_src_axi_awready(1'b0),
+    .m_src_axi_wvalid(),
+    .m_src_axi_wdata(),
+    .m_src_axi_wstrb(),
+    .m_src_axi_wlast(),
+    .m_src_axi_wready(1'b0),
+    .m_src_axi_bvalid(1'b0),
+    .m_src_axi_bresp(0),
+    .m_src_axi_bready(),
+    .m_src_axi_awid(),
+    .m_src_axi_awlock(),
+    .m_src_axi_wid(),
+    .m_src_axi_bid(1'b0),
 
     // Slave streaming AXI interface
     .s_axis_aclk(1'b0),
@@ -872,7 +828,7 @@ module ad9361_pl_wrapper #(
     .s_axis_data(0),
     .s_axis_strb(0),
     .s_axis_keep(0),
-    .s_axis_user(0),
+    .s_axis_user(1'b1),
     .s_axis_id(0),
     .s_axis_dest(0),
     .s_axis_last(1'b0),
@@ -883,20 +839,20 @@ module ad9361_pl_wrapper #(
     .m_axis_ready(fifo_s_axis_ready),
     .m_axis_valid(fifo_s_axis_valid),
     .m_axis_data(fifo_s_axis_data),
-    .m_axis_strb(),
-    .m_axis_keep(),
-    .m_axis_user(),
-    .m_axis_id(),
-    .m_axis_dest(),
-    .m_axis_last(),
-    .m_axis_xfer_req(),
+    .m_axis_strb(), //signals?
+    .m_axis_keep(), //signals?
+    .m_axis_user(), //signals?
+    .m_axis_id(),   //signals?
+    .m_axis_dest(), //signals?
+    .m_axis_last(), //signals?
+    .m_axis_xfer_req(), //signals?
 
     // Input FIFO interface
     .fifo_wr_clk(1'b0),
     .fifo_wr_en(1'b0),
     .fifo_wr_din(0),
     .fifo_wr_overflow(),
-    .fifo_wr_sync(1'b0),
+    .fifo_wr_sync(1'b1),
     .fifo_wr_xfer_req(),
 
     // Input FIFO interface
@@ -1378,7 +1334,7 @@ module ad9361_pl_wrapper #(
   pl_reset_ad9361 inst_pl_reset_ad9361 (
     .slowest_sync_clk(d_clk),          // input wire slowest_sync_clk
     .ext_reset_in(axi_aresetn),                  // input wire ext_reset_in
-    .aux_reset_in(1'b1),                  // input wire aux_reset_in
+    .aux_reset_in(1'b0),                  // input wire aux_reset_in
     .mb_debug_sys_rst(1'b0),          // input wire mb_debug_sys_rst
     .dcm_locked(1'b1),                      // input wire dcm_locked
     .mb_reset(),                          // output wire mb_reset
@@ -1392,7 +1348,7 @@ module ad9361_pl_wrapper #(
     .s_axi_aclk(axi_aclk),        // input wire s_axi_aclk
     .s_axi_aresetn(axi_aresetn),  // input wire s_axi_aresetn
     .iic2intc_irpt(iic2intc_irpt),  // output wire iic2intc_irpt
-    .s_axi_awaddr(iic_fmc_axi_awaddr),    // input wire [8 : 0] s_axi_awaddr
+    .s_axi_awaddr(iic_fmc_axi_awaddr[8:0]),    // input wire [8 : 0] s_axi_awaddr
     .s_axi_awvalid(iic_fmc_axi_awvalid),  // input wire s_axi_awvalid
     .s_axi_awready(iic_fmc_axi_awready),  // output wire s_axi_awready
     .s_axi_wdata(iic_fmc_axi_wdata),      // input wire [31 : 0] s_axi_wdata
@@ -1402,7 +1358,7 @@ module ad9361_pl_wrapper #(
     .s_axi_bresp(iic_fmc_axi_bresp),      // output wire [1 : 0] s_axi_bresp
     .s_axi_bvalid(iic_fmc_axi_bvalid),    // output wire s_axi_bvalid
     .s_axi_bready(iic_fmc_axi_bready),    // input wire s_axi_bready
-    .s_axi_araddr(iic_fmc_axi_araddr),    // input wire [8 : 0] s_axi_araddr
+    .s_axi_araddr(iic_fmc_axi_araddr[8:0]),    // input wire [8 : 0] s_axi_araddr
     .s_axi_arvalid(iic_fmc_axi_arvalid),  // input wire s_axi_arvalid
     .s_axi_arready(iic_fmc_axi_arready),  // output wire s_axi_arready
     .s_axi_rdata(iic_fmc_axi_rdata),      // output wire [31 : 0] s_axi_rdata
