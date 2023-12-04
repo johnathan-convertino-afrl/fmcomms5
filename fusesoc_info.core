@@ -22,6 +22,27 @@ filesets:
     depend:
       - AFRL:utility:digilent_zed_board:1.0.0
 
+  zc706:
+    files:
+      - zc706/system_constr.xdc : {file_type : xdc}
+      - zc706/system_wrapper.v : {file_type : verilogSource}
+      - zc706/system_pl_wrapper.v : {file_type : verilogSource}
+      - zc706/system_pl_gen.tcl : {file_type : tclSource}
+      - zc706/system_gen.tcl : {file_type : tclSource}
+    depend:
+      - AFRL:utility:xilinx_zc706_board:1.0.0
+
+
+  zc702:
+    files:
+      - zc702/system_constr.xdc : {file_type : xdc}
+      - zc702/system_wrapper.v : {file_type : verilogSource}
+      - zc702/system_pl_wrapper.v : {file_type : verilogSource}
+      - zc702/system_pl_gen.tcl : {file_type : tclSource}
+      - zc702/system_gen.tcl : {file_type : tclSource}
+    depend:
+      - AFRL:utility:xilinx_zc702_board:1.0.0
+
   dep:
     depend:
       - AD:RF_Transceiver:axi_ad9361:1.0.0
@@ -49,5 +70,27 @@ targets:
     tools:
       vivado:
         source_mgmt_mode: All
-        board_part: avnet.com:zedboard:1.4 #digilentinc.com:zedboard:1.1
+        board_part: avnet.com:zedboard:1.4
+        part: xc7z020clg484-1
+
+  zc706:
+    <<: *default
+    default_tool: vivado
+    description: zedboard target.
+    filesets_append : ["tool_vivado ? (src_xilinx)", "tool_vivado ? (zc706)"]
+    tools:
+      vivado:
+        source_mgmt_mode: All
+        board_part: xilinx.com:zc706:part0:1.4
+        part: xc7z045ffg900-2
+
+  zc702:
+    <<: *default
+    default_tool: vivado
+    description: zedboard target.
+    filesets_append : ["tool_vivado ? (src_xilinx)", "tool_vivado ? (zc702)"]
+    tools:
+      vivado:
+        source_mgmt_mode: All
+        board_part: xilinx.com:zc702:part0:1.4
         part: xc7z020clg484-1
