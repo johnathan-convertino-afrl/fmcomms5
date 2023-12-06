@@ -21,6 +21,7 @@ filesets:
       - zed/system_gen.tcl : {file_type : tclSource}
     depend:
       - AFRL:utility:digilent_zed_board:1.0.0
+      - AD:common:ad_iobuf:1.0.0
 
   zc706:
     files:
@@ -31,6 +32,7 @@ filesets:
       - zc706/system_gen.tcl : {file_type : tclSource}
     depend:
       - AFRL:utility:xilinx_zc706_board:1.0.0
+      - AD:common:ad_iobuf:1.0.0
 
 
   zc702:
@@ -42,6 +44,17 @@ filesets:
       - zc702/system_gen.tcl : {file_type : tclSource}
     depend:
       - AFRL:utility:xilinx_zc702_board:1.0.0
+      - AD:common:ad_iobuf:1.0.0
+
+  zcu102:
+    files:
+      - zcu102/system_constr.xdc : {file_type : xdc}
+      - zcu102/system_wrapper.v : {file_type : verilogSource}
+      - zcu102/system_pl_wrapper.v : {file_type : verilogSource}
+      - zcu102/system_pl_gen.tcl : {file_type : tclSource}
+      - zcu102/system_gen.tcl : {file_type : tclSource}
+    depend:
+      - AFRL:utility:xilinx_zcu102_board:1.0.0
 
   dep:
     depend:
@@ -53,7 +66,6 @@ filesets:
       - AD:buffer:util_rfifo:1.0.0
       - AD:buffer:util_wfifo:1.0.0
       - AD:common:util_clkdiv:1.0.0
-      - AD:common:ad_iobuf:1.0.0
 
 targets:
 
@@ -76,7 +88,7 @@ targets:
   zc706:
     <<: *default
     default_tool: vivado
-    description: zedboard target.
+    description: zc706 target.
     filesets_append : ["tool_vivado ? (src_xilinx)", "tool_vivado ? (zc706)"]
     tools:
       vivado:
@@ -87,10 +99,21 @@ targets:
   zc702:
     <<: *default
     default_tool: vivado
-    description: zedboard target.
+    description: zc702 target.
     filesets_append : ["tool_vivado ? (src_xilinx)", "tool_vivado ? (zc702)"]
     tools:
       vivado:
         source_mgmt_mode: All
         board_part: xilinx.com:zc702:part0:1.4
         part: xc7z020clg484-1
+
+  zcu102:
+    <<: *default
+    default_tool: vivado
+    description: zcu102 target.
+    filesets_append : ["tool_vivado ? (src_xilinx)", "tool_vivado ? (zcu102)"]
+    tools:
+      vivado:
+        source_mgmt_mode: All
+        board_part: xilinx.com:zcu102:part0:3.4
+        part: xczu9eg-ffvb1156-2-e
