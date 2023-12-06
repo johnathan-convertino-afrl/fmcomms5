@@ -8,9 +8,9 @@ vivado_ip_vlvn_version_check "xilinx.com:ip:axi_crossbar:2.1"
 create_ip -vlnv xilinx.com:ip:axi_crossbar:2.1 -module_name axi_crossbar_ad9361
 set_property CONFIG.NUM_MI {3} [get_ips axi_crossbar_ad9361]
 set_property CONFIG.PROTOCOL {AXI4LITE} [get_ips axi_crossbar_ad9361]
-set_property CONFIG.M00_A00_BASE_ADDR [expr {0x09020000 + $address_offset}] [get_ips axi_crossbar_ad9361]
-set_property CONFIG.M01_A00_BASE_ADDR [expr {0x0C420000 + $address_offset}] [get_ips axi_crossbar_ad9361]
-set_property CONFIG.M02_A00_BASE_ADDR [expr {0x0C400000 + $address_offset}] [get_ips axi_crossbar_ad9361]
+set_property CONFIG.M00_A00_BASE_ADDR [format 0x%x [expr "0x09020000 + $address_offset"]] [get_ips axi_crossbar_ad9361]
+set_property CONFIG.M01_A00_BASE_ADDR [format 0x%x [expr "0x0C420000 + $address_offset"]] [get_ips axi_crossbar_ad9361]
+set_property CONFIG.M02_A00_BASE_ADDR [format 0x%x [expr "0x0C400000 + $address_offset"]] [get_ips axi_crossbar_ad9361]
 set_property CONFIG.M00_A00_ADDR_WIDTH {16} [get_ips axi_crossbar_ad9361]
 set_property CONFIG.M01_A00_ADDR_WIDTH {12} [get_ips axi_crossbar_ad9361]
 set_property CONFIG.M02_A00_ADDR_WIDTH {12} [get_ips axi_crossbar_ad9361]
