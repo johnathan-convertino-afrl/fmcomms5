@@ -129,17 +129,31 @@ add_connection axi_dac_dma.m_axis util_dac_upack.s_axis
 
 # interrupts
 
-ad_cpu_interrupt 2 axi_adc_dma.interrupt_sender
-ad_cpu_interrupt 3 axi_dac_dma.interrupt_sender
+add_connection sys_hps.f2h_irq0 axi_adc_dma.interrupt_sender
+set_connection_parameter_value sys_hps.f2h_irq0/axi_adc_dma.interrupt_sender irqNumber 2
+
+add_connection sys_hps.f2h_irq0 axi_dac_dma.interrupt_sender
+set_connection_parameter_value sys_hps.f2h_irq0/axi_dac_dma.interrupt_sender irqNumber 3
 
 # cpu interconnects
 
-ad_cpu_interconnect 0x00020000 axi_ad9361.s_axi
-ad_cpu_interconnect 0x00040000 axi_adc_dma.s_axi
-ad_cpu_interconnect 0x00044000 axi_dac_dma.s_axi
+add_connection sys_hps.h2f_lw_axi_master axi_ad9361.s_axi
+set_connection_parameter_value sys_hps.h2f_lw_axi_master/axi_ad9361.s_axi baseAddress 0x00020000
+
+add_connection sys_hps.h2f_lw_axi_master axi_adc_dma.s_axi
+set_connection_parameter_value sys_hps.h2f_lw_axi_master/axi_adc_dma.s_axi baseAddress 0x00040000
+
+add_connection sys_hps.h2f_lw_axi_master axi_dac_dma.s_axi
+set_connection_parameter_value sys_hps.h2f_lw_axi_master/axi_dac_dma.s_axi baseAddress 0x00044000
 
 # mem interconnects
 # set_instance_parameter_value sys_hps {F2SDRAM_Width} {64 128 64}
 
 ad_dma_interconnect axi_adc_dma.m_dest_axi
 ad_dma_interconnect axi_dac_dma.m_src_axi
+
+add_connection axi_adc_dma.m_dest_axi sys_hps.f2sdram0_data
+set_connection_parameter_value axi_adc_dma.m_dest_axi/sys_hps.f2sdram0_data baseAddress {0x0}
+
+add_connection axi_dac_dma.m_src_axi sys_hps.f2sdram0_data
+set_connection_parameter_value axi_dac_dma.m_src_axi/sys_hps.f2sdram0_data baseAddress {0x0}
