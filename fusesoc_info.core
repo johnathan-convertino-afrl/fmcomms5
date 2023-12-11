@@ -56,6 +56,16 @@ filesets:
     depend:
       - AFRL:utility:xilinx_zcu102_board:1.0.0
 
+  hanpilot:
+    files:
+      - hanpilot/system_constr.sdc : {file_type : SDC}
+      - hanpilot/system_wrapper.v : {file_type : verilogSource}
+      - hanpilot/system_pl_wrapper.v : {file_type : verilogSource}
+      - hanpilot/system_pl_gen.tcl : {file_type : tclSource}
+      - hanpilot/system_gen.tcl : {file_type : tclSource}
+    depend:
+      - AFRL:utility:terasic_hanpilot_board:1.0.0
+
   dep:
     depend:
       - AD:RF_Transceiver:axi_ad9361:1.0.0
@@ -66,6 +76,7 @@ filesets:
       - AD:buffer:util_rfifo:1.0.0
       - AD:buffer:util_wfifo:1.0.0
       - AD:common:util_clkdiv:1.0.0
+      - AD:common:ad_rst:1.0.0
 
 targets:
 
@@ -117,3 +128,13 @@ targets:
         source_mgmt_mode: All
         board_part: xilinx.com:zcu102:part0:3.4
         part: xczu9eg-ffvb1156-2-e
+
+  hanpilot:
+    default_tool: quartus
+    description: hanpilot target.
+    toplevel: system_wrapper
+    filesets : ["tool_quartus ? (hanpilot)"]
+    tools:
+      quartus:
+        family: Arria 10
+        device: 10AS066K3F40E2SG

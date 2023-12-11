@@ -1291,17 +1291,11 @@ module ad9361_pl_wrapper #(
     .sync_out(sync_out)
   );
 
-  pl_reset_ad9361 inst_pl_reset_ad9361 (
-    .slowest_sync_clk(d_clk),          // input wire slowest_sync_clk
-    .ext_reset_in(axi_aresetn),                  // input wire ext_reset_in
-    .aux_reset_in(1'b0),                  // input wire aux_reset_in
-    .mb_debug_sys_rst(1'b0),          // input wire mb_debug_sys_rst
-    .dcm_locked(1'b1),                      // input wire dcm_locked
-    .mb_reset(),                          // output wire mb_reset
-    .bus_struct_reset(),          // output wire [0 : 0] bus_struct_reset
-    .peripheral_reset(p_reset),          // output wire [0 : 0] peripheral_reset
-    .interconnect_aresetn(),  // output wire [0 : 0] interconnect_aresetn
-    .peripheral_aresetn(p_aresetn)      // output wire [0 : 0] peripheral_aresetn
+  ad_rst inst_ad_reset (
+    .rst_async(~axi_aresetn),
+    .clk(d_clk),
+    .rstn(p_aresetn),
+    .rst(p_reset)
   );
 
   axi_crossbar_ad9361 inst_axi_crossbar_ad9361 (
