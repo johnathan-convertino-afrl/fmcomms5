@@ -34,7 +34,10 @@ module ad9361_pl_wrapper #(
     parameter ADC_INIT_DELAY = 23,
     parameter DAC_INIT_DELAY = 0,
     parameter DELAY_REFCLK_FREQUENCY = 200,
-    parameter DMA_AXI_PROTOCOL_TO_PS = 1 //1 = AXI3, 0 = AXI4
+    parameter DMA_AXI_PROTOCOL_TO_PS = 1, //1 = AXI3, 0 = AXI4
+    parameter AXI_DMAC_ADC_ADDR = 32'h7C400000,
+    parameter AXI_DMAC_DAC_ADDR = 32'h7C420000,
+    parameter AXI_AD9361_ADDR = 32'h79020000
   ) (
     //AXI4LITE SLAVE INTERFACE TO CROSSBAR
     input axi_aclk,
@@ -1298,47 +1301,54 @@ module ad9361_pl_wrapper #(
     .rst(p_reset)
   );
 
-  axi_crossbar_ad9361 inst_axi_crossbar_ad9361 (
-    .aclk(axi_aclk),                    // wire aclk
-    .aresetn(axi_aresetn),              // wire aresetn
-    .s_axi_awaddr(s_axi_awaddr),    // wire [31 : 0] s_axi_awaddr
-    .s_axi_awprot(s_axi_awprot),    // wire [2 : 0] s_axi_awprot
-    .s_axi_awvalid(s_axi_awvalid),  // wire [0 : 0] s_axi_awvalid
-    .s_axi_awready(s_axi_awready),  // wire [0 : 0] s_axi_awready
-    .s_axi_wdata(s_axi_wdata),      // wire [31 : 0] s_axi_wdata
-    .s_axi_wstrb(s_axi_wstrb),      // wire [3 : 0] s_axi_wstrb
-    .s_axi_wvalid(s_axi_wvalid),    // wire [0 : 0] s_axi_wvalid
-    .s_axi_wready(s_axi_wready),    // wire [0 : 0] s_axi_wready
-    .s_axi_bresp(s_axi_bresp),      // wire [1 : 0] s_axi_bresp
-    .s_axi_bvalid(s_axi_bvalid),    // wire [0 : 0] s_axi_bvalid
-    .s_axi_bready(s_axi_bready),    // wire [0 : 0] s_axi_bready
-    .s_axi_araddr(s_axi_araddr),    // wire [31 : 0] s_axi_araddr
-    .s_axi_arprot(s_axi_arprot),    // wire [2 : 0] s_axi_arprot
-    .s_axi_arvalid(s_axi_arvalid),  // wire [0 : 0] s_axi_arvalid
-    .s_axi_arready(s_axi_arready),  // wire [0 : 0] s_axi_arready
-    .s_axi_rdata(s_axi_rdata),      // wire [31 : 0] s_axi_rdata
-    .s_axi_rresp(s_axi_rresp),      // wire [1 : 0] s_axi_rresp
-    .s_axi_rvalid(s_axi_rvalid),    // wire [0 : 0] s_axi_rvalid
-    .s_axi_rready(s_axi_rready),    // wire [0 : 0] s_axi_rready
-    .m_axi_awaddr({adc_dma_axi_awaddr, dac_dma_axi_awaddr, ad9361_axi_awaddr}),
-    .m_axi_awprot({adc_dma_axi_awprot, dac_dma_axi_awprot, ad9361_axi_awprot}),
-    .m_axi_awvalid({adc_dma_axi_awvalid, dac_dma_axi_awvalid, ad9361_axi_awvalid}),
-    .m_axi_awready({adc_dma_axi_awready, dac_dma_axi_awready, ad9361_axi_awready}),
-    .m_axi_wdata({adc_dma_axi_wdata, dac_dma_axi_wdata, ad9361_axi_wdata}),
-    .m_axi_wstrb({adc_dma_axi_wstrb, dac_dma_axi_wstrb, ad9361_axi_wstrb}),
-    .m_axi_wvalid({adc_dma_axi_wvalid, dac_dma_axi_wvalid, ad9361_axi_wvalid}),
-    .m_axi_wready({adc_dma_axi_wready, dac_dma_axi_wready, ad9361_axi_wready}),
-    .m_axi_bresp({adc_dma_axi_bresp, dac_dma_axi_bresp, ad9361_axi_bresp}),
-    .m_axi_bvalid({adc_dma_axi_bvalid, dac_dma_axi_bvalid, ad9361_axi_bvalid}),
-    .m_axi_bready({adc_dma_axi_bready, dac_dma_axi_bready, ad9361_axi_bready}),
-    .m_axi_araddr({adc_dma_axi_araddr, dac_dma_axi_araddr, ad9361_axi_araddr}),
-    .m_axi_arprot({adc_dma_axi_arprot, dac_dma_axi_arprot, ad9361_axi_arprot}),
-    .m_axi_arvalid({adc_dma_axi_arvalid, dac_dma_axi_arvalid, ad9361_axi_arvalid}),
-    .m_axi_arready({adc_dma_axi_arready, dac_dma_axi_arready, ad9361_axi_arready}),
-    .m_axi_rdata({adc_dma_axi_rdata, dac_dma_axi_rdata, ad9361_axi_rdata}),
-    .m_axi_rresp({adc_dma_axi_rresp, dac_dma_axi_rresp, ad9361_axi_rresp}),
-    .m_axi_rvalid({adc_dma_axi_rvalid, dac_dma_axi_rvalid, ad9361_axi_rvalid}),
-    .m_axi_rready({adc_dma_axi_rready, dac_dma_axi_rready, ad9361_axi_rready})
+  axilxbar #(
+    .C_AXI_DATA_WIDTH(32),
+    .C_AXI_ADDR_WIDTH(32),
+    .NM(1),
+    .NS(3),
+    .SLAVE_ADDR({{AXI_DMAC_ADC_ADDR},{AXI_DMAC_DAC_ADDR},{AXI_AD9361_ADDR}}),
+    .SLAVE_MASK({{32'hFFFFF000},{32'hFFFFF000},{32'hFFFF0000}})
+  ) inst_axilxbar (
+    .S_AXI_ACLK(axi_aclk),
+    .S_AXI_ARESETN(axi_aresetn),
+    .S_AXI_AWADDR(s_axi_awaddr),
+    .S_AXI_AWPROT(s_axi_awprot),
+    .S_AXI_AWVALID(s_axi_awvalid),
+    .S_AXI_AWREADY(s_axi_awready),
+    .S_AXI_WDATA(s_axi_wdata),
+    .S_AXI_WSTRB(s_axi_wstrb),
+    .S_AXI_WVALID(s_axi_wvalid),
+    .S_AXI_WREADY(s_axi_wready),
+    .S_AXI_BRESP(s_axi_bresp),
+    .S_AXI_BVALID(s_axi_bvalid),
+    .S_AXI_BREADY(s_axi_bready),
+    .S_AXI_ARADDR(s_axi_araddr),
+    .S_AXI_ARPROT(s_axi_arprot),
+    .S_AXI_ARVALID(s_axi_arvalid),
+    .S_AXI_ARREADY(s_axi_arready),
+    .S_AXI_RDATA(s_axi_rdata),
+    .S_AXI_RRESP(s_axi_rresp),
+    .S_AXI_RVALID(s_axi_rvalid),
+    .S_AXI_RREADY(s_axi_rready),
+    .M_AXI_AWADDR({adc_dma_axi_awaddr, dac_dma_axi_awaddr, ad9361_axi_awaddr}),
+    .M_AXI_AWPROT({adc_dma_axi_awprot, dac_dma_axi_awprot, ad9361_axi_awprot}),
+    .M_AXI_AWVALID({adc_dma_axi_awvalid, dac_dma_axi_awvalid, ad9361_axi_awvalid}),
+    .M_AXI_AWREADY({adc_dma_axi_awready, dac_dma_axi_awready, ad9361_axi_awready}),
+    .M_AXI_WDATA({adc_dma_axi_wdata, dac_dma_axi_wdata, ad9361_axi_wdata}),
+    .M_AXI_WSTRB({adc_dma_axi_wstrb, dac_dma_axi_wstrb, ad9361_axi_wstrb}),
+    .M_AXI_WVALID({adc_dma_axi_wvalid, dac_dma_axi_wvalid, ad9361_axi_wvalid}),
+    .M_AXI_WREADY({adc_dma_axi_wready, dac_dma_axi_wready, ad9361_axi_wready}),
+    .M_AXI_BRESP({adc_dma_axi_bresp, dac_dma_axi_bresp, ad9361_axi_bresp}),
+    .M_AXI_BVALID({adc_dma_axi_bvalid, dac_dma_axi_bvalid, ad9361_axi_bvalid}),
+    .M_AXI_BREADY({adc_dma_axi_bready, dac_dma_axi_bready, ad9361_axi_bready}),
+    .M_AXI_ARADDR({adc_dma_axi_araddr, dac_dma_axi_araddr, ad9361_axi_araddr}),
+    .M_AXI_ARPROT({adc_dma_axi_arprot, dac_dma_axi_arprot, ad9361_axi_arprot}),
+    .M_AXI_ARVALID({adc_dma_axi_arvalid, dac_dma_axi_arvalid, ad9361_axi_arvalid}),
+    .M_AXI_ARREADY({adc_dma_axi_arready, dac_dma_axi_arready, ad9361_axi_arready}),
+    .M_AXI_RDATA({adc_dma_axi_rdata, dac_dma_axi_rdata, ad9361_axi_rdata}),
+    .M_AXI_RRESP({adc_dma_axi_rresp, dac_dma_axi_rresp, ad9361_axi_rresp}),
+    .M_AXI_RVALID({adc_dma_axi_rvalid, dac_dma_axi_rvalid, ad9361_axi_rvalid}),
+    .M_AXI_RREADY({adc_dma_axi_rready, dac_dma_axi_rready, ad9361_axi_rready})
   );
 
 endmodule
