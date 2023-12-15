@@ -63,7 +63,7 @@ filesets:
       - hanpilot/system_pl_gen.tcl : {file_type : tclSource}
       - hanpilot/system_gen.tcl : {file_type : tclSource}
     depend:
-      - AFRL:utility:terasic_hanpilot_board:1.0.0
+      - AFRL:utility:terasic_hanpilot_board_base:1.0.0
 
   dep:
     depend:
@@ -131,10 +131,11 @@ targets:
         part: xczu9eg-ffvb1156-2-e
 
   hanpilot:
+    <<: *default
     default_tool: quartus
     description: hanpilot target.
     toplevel: system_wrapper
-    filesets : ["tool_quartus ? (hanpilot)"]
+    filesets_append : [src_ad9361_pl, "tool_quartus ? (hanpilot)"]
     tools:
       quartus:
         family: Arria 10

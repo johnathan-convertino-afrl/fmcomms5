@@ -1,4 +1,4 @@
-# vivado_ip_vlvn_version_check "xilinx.com:ip:axi_crossbar:2.1"
+# ip_vlvn_version_check "xilinx.com:ip:axi_crossbar:2.1"
 #
 # # crossbar will allow multiple devices slave devices connect to a single master.
 # create_ip -vlnv xilinx.com:ip:axi_crossbar:2.1 -module_name axi_crossbar_pl
@@ -13,7 +13,7 @@
 #
 # generate_target all [get_ips axi_crossbar_pl]
 #
-# vivado_ip_vlvn_version_check "xilinx.com:ip:axi_iic:2.1"
+# ip_vlvn_version_check "xilinx.com:ip:axi_iic:2.1"
 #
 # create_ip -vlnv xilinx.com:ip:axi_iic:2.1 -module_name axi_iic_fmc
 #
