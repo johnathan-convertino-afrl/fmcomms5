@@ -65,6 +65,16 @@ filesets:
     depend:
       - AFRL:utility:terasic_hanpilot_board_base:1.0.0
 
+  a10soc:
+    files:
+      - a10soc/system_constr.sdc : {file_type : SDC}
+      - a10soc/system_wrapper.v : {file_type : verilogSource}
+      - a10soc/system_pl_wrapper.v : {file_type : verilogSource}
+      - a10soc/system_pl_gen.tcl : {file_type : tclSource}
+      - a10soc/system_gen.tcl : {file_type : tclSource}
+    depend:
+      - AFRL:utility:intel_a10soc_board_base:1.0.0
+
   dep:
     depend:
       - AD:RF_Transceiver:axi_ad9361:1.0.0
@@ -134,9 +144,18 @@ targets:
     <<: *default
     default_tool: quartus
     description: hanpilot target.
-    toplevel: system_wrapper
     filesets_append : [src_ad9361_pl, "tool_quartus ? (hanpilot)"]
     tools:
       quartus:
         family: Arria 10
         device: 10AS066K3F40E2SG
+
+  a10soc:
+    <<: *default
+    default_tool: quartus
+    description: a10soc target.
+    filesets_append : [src_ad9361_pl, "tool_quartus ? (a10soc)"]
+    tools:
+      quartus:
+        family: Arria 10
+        device: 10AS066N3F40E2SG

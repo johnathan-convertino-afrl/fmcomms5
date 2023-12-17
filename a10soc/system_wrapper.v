@@ -1,7 +1,7 @@
 //******************************************************************************
 /// @FILE    system_wrapper.v
 /// @AUTHOR  JAY CONVERTINO
-/// @DATE    2023.11.02
+/// @DATE    2023.12.17
 /// @BRIEF   System wrapper for pl and ps.
 ///
 /// @LICENSE MIT
@@ -76,7 +76,7 @@ module system_wrapper #(
 
     output  [  0:0]   hps_sdio_clk,
     inout   [  0:0]   hps_sdio_cmd,
-    inout   [  3:0]   hps_sdio_d,
+    inout   [  7:0]   hps_sdio_d,
 
     // hps-usb
 
@@ -91,38 +91,21 @@ module system_wrapper #(
     input   [  0:0]   hps_uart_rx,
     output  [  0:0]   hps_uart_tx,
 
-    // hps-i2c
+    // hps-i2c (shared w fmc-a, fmc-b)
 
     inout   [  0:0]   hps_i2c_sda,
     inout   [  0:0]   hps_i2c_scl,
 
-    // gpio (HPS)
+    // hps-gpio (max-v-u16)
 
     inout   [  3:0]   hps_gpio,
-    inout             hps_led,
-    inout             hps_key,
 
-    // gpio (FPGA)
+    // gpio (max-v-u21)
 
-    input   [  3:0]   gpio_bd_i,
-    output  [ 17:0]   gpio_bd_o,
-
-    // FPGA i2c
-
-    inout             fpga_i2c_sda,
-    inout             fpga_i2c_scl,
-
-    //alerts
-  //   input             pm_alert_n,
-  //   input             fan_alert_n,
-
-    //interrupt
-    inout            mpu_int,
+    input   [  7:0]   gpio_bd_i,
+    output  [  3:0]   gpio_bd_o,
 
     // ad9361-interface
-
-    inout             fmc_i2c_sda,
-    inout             fmc_i2c_scl,
 
     input             rx_clk_in,
     input             rx_frame_in_p,
@@ -219,27 +202,6 @@ module system_wrapper #(
   wire              sys_resetn_s;
   wire    [ 63:0]   gpio_i;
   wire    [ 63:0]   gpio_o;
-  wire              fpga_i2c_scl_in;
-  wire              fpga_i2c_sda_in;
-  wire              fpga_i2c_scl_oe;
-  wire              fpga_i2c_sda_oe;
-  wire              fmc_i2c_scl_in;
-  wire              fmc_i2c_sda_in;
-  wire              fmc_i2c_scl_oe;
-  wire              fmc_i2c_sda_oe;
-
-  // ad_iobuf #(.DATA_WIDTH(49)) i_iobuf_gpio (
-  //   .dio_t ({gpio_t[50:49], gpio_t[46:0]}),
-  //   .dio_i ({gpio_o[50:49], gpio_o[46:0]}),
-  //   .dio_o ({gpio_i[50:49], gpio_i[46:0]}),
-  //   .dio_p ({ gpio_muxout_tx,
-  //             gpio_muxout_rx,
-  //             gpio_resetb,
-  //             gpio_sync,
-  //             gpio_en_agc,
-  //             gpio_ctl,
-  //             gpio_status,
-  //             gpio_bd}));
 
   // assignments
 
@@ -251,27 +213,13 @@ module system_wrapper #(
   assign gpio_ctl       = gpio_o[43:40];
   assign gpio_i[39:32]  = gpio_status;
 
-  // board stuff
+  // board stuff (max-v-u21)
 
   assign gpio_i[31:12] = gpio_o[31:12];
-  assign gpio_i[11: 6] = 0;
-  assign gpio_i[ 5: 2] = gpio_bd_i;
-  assign gpio_i[ 1: 0] = gpio_o[1:0];
+  assign gpio_i[11: 4] = gpio_bd_i;
+  assign gpio_i[ 3: 0] = gpio_o[ 3: 0];
 
-  assign gpio_bd_o[1:0] = gpio_o[1:0];
-  assign gpio_bd_o[17:2] = gpio_o[29:14];
-
-  // Intel application note UG-01085
-  assign fpga_i2c_scl = fpga_i2c_scl_oe ? 1'b0 : 1'bz;
-  assign fpga_i2c_sda = fpga_i2c_sda_oe ? 1'b0 : 1'bz;
-  assign fpga_i2c_scl_in = fpga_i2c_scl;
-  assign fpga_i2c_sda_in = fpga_i2c_sda;
-
-  // Intel application note UG-01085
-  assign fmc_i2c_scl = fmc_i2c_scl_oe ? 1'b0 : 1'bz;
-  assign fmc_i2c_sda = fmc_i2c_sda_oe ? 1'b0 : 1'bz;
-  assign fmc_i2c_scl_in = fmc_i2c_scl;
-  assign fmc_i2c_sda_in = fmc_i2c_sda;
+  assign gpio_bd_o = gpio_o[3:0];
 
   // peripheral reset
 
@@ -409,6 +357,7 @@ module system_wrapper #(
 
     .sys_hps_rstn_reset_n (sys_resetn),
     .sys_rstn_reset_n (sys_resetn_s),
+
     .sys_hps_io_hps_io_phery_emac0_TX_CLK (hps_eth_txclk),
     .sys_hps_io_hps_io_phery_emac0_TXD0 (hps_eth_txd[0]),
     .sys_hps_io_hps_io_phery_emac0_TXD1 (hps_eth_txd[1]),
@@ -428,6 +377,10 @@ module system_wrapper #(
     .sys_hps_io_hps_io_phery_sdmmc_D1 (hps_sdio_d[1]),
     .sys_hps_io_hps_io_phery_sdmmc_D2 (hps_sdio_d[2]),
     .sys_hps_io_hps_io_phery_sdmmc_D3 (hps_sdio_d[3]),
+    .sys_hps_io_hps_io_phery_sdmmc_D4 (hps_sdio_d[4]),
+    .sys_hps_io_hps_io_phery_sdmmc_D5 (hps_sdio_d[5]),
+    .sys_hps_io_hps_io_phery_sdmmc_D6 (hps_sdio_d[6]),
+    .sys_hps_io_hps_io_phery_sdmmc_D7 (hps_sdio_d[7]),
     .sys_hps_io_hps_io_phery_sdmmc_CCLK (hps_sdio_clk),
     .sys_hps_io_hps_io_phery_usb0_DATA0 (hps_usb_d[0]),
     .sys_hps_io_hps_io_phery_usb0_DATA1 (hps_usb_d[1]),
@@ -443,15 +396,13 @@ module system_wrapper #(
     .sys_hps_io_hps_io_phery_usb0_NXT (hps_usb_nxt),
     .sys_hps_io_hps_io_phery_uart1_RX (hps_uart_rx),
     .sys_hps_io_hps_io_phery_uart1_TX (hps_uart_tx),
-    .sys_hps_io_hps_io_phery_i2c0_SDA (hps_i2c_sda),
-    .sys_hps_io_hps_io_phery_i2c0_SCL (hps_i2c_scl),
-    .sys_hps_io_hps_io_gpio_gpio1_io1 (hps_led),
-    .sys_hps_io_hps_io_gpio_gpio1_io4 (hps_key),
-    .sys_hps_io_hps_io_gpio_gpio1_io15(mpu_int),
-    .sys_hps_io_hps_io_gpio_gpio2_io8 (hps_gpio[0]),
-    .sys_hps_io_hps_io_gpio_gpio2_io9 (hps_gpio[1]),
-    .sys_hps_io_hps_io_gpio_gpio2_io10 (hps_gpio[2]),
-    .sys_hps_io_hps_io_gpio_gpio2_io11 (hps_gpio[3]),
+    .sys_hps_io_hps_io_phery_i2c1_SDA (hps_i2c_sda),
+    .sys_hps_io_hps_io_phery_i2c1_SCL (hps_i2c_scl),
+    .sys_hps_io_hps_io_gpio_gpio1_io5 (hps_gpio[0]),
+    .sys_hps_io_hps_io_gpio_gpio1_io14 (hps_gpio[1]),
+    .sys_hps_io_hps_io_gpio_gpio1_io16 (hps_gpio[2]),
+    .sys_hps_io_hps_io_gpio_gpio1_io17 (hps_gpio[3]),
+
     .sys_hps_out_rstn_reset_n (sys_hps_resetn),
     .sys_hps_fpga_irq1_irq ({{30{1'b0}}, s_adc_dma_irq, s_dac_dma_irq}),
 
@@ -517,17 +468,7 @@ module system_wrapper #(
     .sys_spi_MISO(spi_miso),
     .sys_spi_MOSI(spi_mosi),
     .sys_spi_SCLK(spi_clk),
-    .sys_spi_SS_n(spi_csn),
-
-    .sys_i2c_sda_in(fpga_i2c_sda_in),
-    .sys_i2c_scl_in(fpga_i2c_scl_in),
-    .sys_i2c_sda_oe(fpga_i2c_sda_oe),
-    .sys_i2c_scl_oe(fpga_i2c_scl_oe),
-
-    .fmc_i2c_sda_in(fmc_i2c_sda_in),
-    .fmc_i2c_scl_in(fmc_i2c_scl_in),
-    .fmc_i2c_sda_oe(fmc_i2c_sda_oe),
-    .fmc_i2c_scl_oe(fmc_i2c_scl_oe)
+    .sys_spi_SS_n(spi_csn)
   );
 
 
