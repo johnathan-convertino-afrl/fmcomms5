@@ -16,9 +16,13 @@ filesets:
       - zed/system_pl_gen.tcl : {file_type : tclSource}
       - zed/system_gen.tcl : {file_type : tclSource}
     depend:
-      - AFRL:utility:digilent_zed_board:1.0.0
+      - AFRL:utility:digilent_zed_board_base:1.0.0
       - AFRL:utility:vivado_board_support_packages
       - AD:common:ad_iobuf:1.0.0
+
+  zed_bootgen:
+    depend:
+      - AFRL:utility:digilent_zed_boot_gen:1.0.0
 
   zc706:
     files:
@@ -28,9 +32,13 @@ filesets:
       - zc706/system_pl_gen.tcl : {file_type : tclSource}
       - zc706/system_gen.tcl : {file_type : tclSource}
     depend:
-      - AFRL:utility:xilinx_zc706_board:1.0.0
+      - AFRL:utility:xilinx_zc706_board_base:1.0.0
       - AFRL:utility:vivado_board_support_packages
       - AD:common:ad_iobuf:1.0.0
+
+  zc706_bootgen:
+    depend:
+      - AFRL:utility:xilinx_zc706_boot_gen:1.0.0
 
   zc702:
     files:
@@ -40,9 +48,13 @@ filesets:
       - zc702/system_pl_gen.tcl : {file_type : tclSource}
       - zc702/system_gen.tcl : {file_type : tclSource}
     depend:
-      - AFRL:utility:xilinx_zc702_board:1.0.0
+      - AFRL:utility:xilinx_zc702_board_base:1.0.0
       - AFRL:utility:vivado_board_support_packages
       - AD:common:ad_iobuf:1.0.0
+
+  zc702_bootgen:
+    depend:
+      - AFRL:utility:xilinx_zc702_boot_gen:1.0.0
 
   zcu102:
     files:
@@ -52,7 +64,7 @@ filesets:
       - zcu102/system_pl_gen.tcl : {file_type : tclSource}
       - zcu102/system_gen.tcl : {file_type : tclSource}
     depend:
-      - AFRL:utility:xilinx_zcu102_board:1.0.0
+      - AFRL:utility:xilinx_zcu102_board_base:1.0.0
       - AFRL:utility:vivado_board_support_packages
 
   hanpilot:
@@ -96,7 +108,7 @@ targets:
     filesets: [dep]
     toplevel: system_wrapper
 
-  zed:
+  zed: &zed
     <<: *default
     default_tool: vivado
     description: zedboard target.
@@ -107,7 +119,11 @@ targets:
         board_part: avnet.com:zedboard:1.4
         part: xc7z020clg484-1
 
-  zc706:
+  zed_bootgen:
+    <<: *zed
+    filesets_append : [zed_bootgen]
+
+  zc706: &zc706
     <<: *default
     default_tool: vivado
     description: zc706 target.
@@ -118,7 +134,11 @@ targets:
         board_part: xilinx.com:zc706:part0:1.4
         part: xc7z045ffg900-2
 
-  zc702:
+  zc706_bootgen:
+    <<: *zc706
+    filesets_append : [zc706_bootgen]
+
+  zc702: &zc702
     <<: *default
     default_tool: vivado
     description: zc702 target.
@@ -129,7 +149,11 @@ targets:
         board_part: xilinx.com:zc702:part0:1.4
         part: xc7z020clg484-1
 
-  zcu102:
+  zc702_bootgen:
+    <<: *zc702
+    filesets_append : [zc702_bootgen]
+
+  zcu102: &zcu102
     <<: *default
     default_tool: vivado
     description: zcu102 target.
@@ -140,7 +164,7 @@ targets:
         board_part: xilinx.com:zcu102:part0:3.4
         part: xczu9eg-ffvb1156-2-e
 
-  hanpilot:
+  hanpilot: &hanpilot
     <<: *default
     default_tool: quartus
     description: hanpilot target.
@@ -150,7 +174,7 @@ targets:
         family: Arria 10
         device: 10AS066K3F40E2SG
 
-  a10soc:
+  a10soc: &a10soc
     <<: *default
     default_tool: quartus
     description: a10soc target.
