@@ -121,6 +121,7 @@ targets:
 
   zed_bootgen:
     <<: *zed
+    description: zed build with boot.bin output in BOOTFS folder.
     filesets_append : [zed_bootgen]
 
   zc706: &zc706
@@ -136,6 +137,7 @@ targets:
 
   zc706_bootgen:
     <<: *zc706
+    description: zc706 build with boot.bin output in BOOTFS folder.
     filesets_append : [zc706_bootgen]
 
   zc702: &zc702
@@ -151,6 +153,7 @@ targets:
 
   zc702_bootgen:
     <<: *zc702
+    description: zc702 build with boot.bin output in BOOTFS folder.
     filesets_append : [zc702_bootgen]
 
   zcu102: &zcu102
