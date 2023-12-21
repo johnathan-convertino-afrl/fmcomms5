@@ -67,6 +67,10 @@ filesets:
       - AFRL:utility:xilinx_zcu102_board_base:1.0.0
       - AFRL:utility:vivado_board_support_packages
 
+  zcu102_bootgen:
+    depend:
+      - AFRL:utility:xilinx_zcu102_boot_gen:1.0.0
+
   hanpilot:
     files:
       - hanpilot/system_constr.sdc : {file_type : SDC}
@@ -166,6 +170,11 @@ targets:
         source_mgmt_mode: DisplayOnly
         board_part: xilinx.com:zcu102:part0:3.4
         part: xczu9eg-ffvb1156-2-e
+
+  zcu102_bootgen:
+    <<: *zcu102
+    description: zcu102 build with boot.bin output in BOOTFS folder.
+    filesets_append : [zcu102_bootgen]
 
   hanpilot: &hanpilot
     <<: *default
