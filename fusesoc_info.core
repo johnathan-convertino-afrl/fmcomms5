@@ -81,6 +81,10 @@ filesets:
     depend:
       - AFRL:utility:terasic_hanpilot_board_base:1.0.0
 
+  hanpilot_bootgen:
+    depend:
+      - AFRL:utility:terasic_hanpilot_boot_gen:1.0.0
+
   a10soc:
     files:
       - a10soc/system_constr.sdc : {file_type : SDC}
@@ -90,6 +94,10 @@ filesets:
       - a10soc/system_gen.tcl : {file_type : tclSource}
     depend:
       - AFRL:utility:intel_a10soc_board_base:1.0.0
+
+  a10soc_bootgen:
+    depend:
+      - AFRL:utility:intel_a10soc_boot_gen:1.0.0
 
   dep:
     depend:
@@ -186,6 +194,11 @@ targets:
         family: Arria 10
         device: 10AS066K3F40E2SG
 
+  hanpilot_bootgen:
+    <<: *hanpilot
+    description: hanpilot build with BOOTFS file generation.
+    filesets_append : [hanpilot_bootgen]
+
   a10soc: &a10soc
     <<: *default
     default_tool: quartus
@@ -195,3 +208,8 @@ targets:
       quartus:
         family: Arria 10
         device: 10AS066N3F40E2SG
+
+  a10soc_bootgen:
+    <<: *a10soc
+    description: arria10 build with BOOTFS file generation.
+    filesets_append : [a10soc_bootgen]
