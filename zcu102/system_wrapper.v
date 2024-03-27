@@ -1,11 +1,11 @@
 //******************************************************************************
 /// @FILE    system_wrapper.v
 /// @AUTHOR  JAY CONVERTINO
-/// @DATE    2023.11.02
+/// @DATE    2024.03.27
 /// @BRIEF   System wrapper for pl and ps.
 ///
 /// @LICENSE MIT
-///  Copyright 2023 Jay Convertino
+///  Copyright 2024 Jay Convertino
 ///
 ///  Permission is hereby granted, free of charge, to any person obtaining a copy
 ///  of this software and associated documentation files (the "Software"), to
@@ -35,41 +35,70 @@ module system_wrapper #(
     parameter ADC_INIT_DELAY = 11,
     parameter DAC_INIT_DELAY = 0
   ) (
-    input   [12:0]  gpio_bd_i,
-    output  [ 7:0]  gpio_bd_o,
+    input       [12:0]      gpio_bd_i,
+    output      [ 7:0]      gpio_bd_o,
 
-    input           rx_clk_in_p,
-    input           rx_clk_in_n,
-    input           rx_frame_in_p,
-    input           rx_frame_in_n,
-    input   [ 5:0]  rx_data_in_p,
-    input   [ 5:0]  rx_data_in_n,
-    output          tx_clk_out_p,
-    output          tx_clk_out_n,
-    output          tx_frame_out_p,
-    output          tx_frame_out_n,
-    output  [ 5:0]  tx_data_out_p,
-    output  [ 5:0]  tx_data_out_n,
+    input                   rx_clk_in_0_p,
+    input                   rx_clk_in_0_n,
+    input                   rx_frame_in_0_p,
+    input                   rx_frame_in_0_n,
+    input       [ 5:0]      rx_data_in_0_p,
+    input       [ 5:0]      rx_data_in_0_n,
+    output                  tx_clk_out_0_p,
+    output                  tx_clk_out_0_n,
+    output                  tx_frame_out_0_p,
+    output                  tx_frame_out_0_n,
+    output      [ 5:0]      tx_data_out_0_p,
+    output      [ 5:0]      tx_data_out_0_n,
+    input       [ 7:0]      gpio_status_0,
+    output      [ 3:0]      gpio_ctl_0,
+    output                  gpio_en_agc_0,
+    output  reg             mcs_sync,
+    output                  gpio_resetb_0,
+    output                  enable_0,
+    output                  txnrx_0,
+    output                  gpio_debug_1_0,
+    output                  gpio_debug_2_0,
+    output                  gpio_calsw_1_0,
+    output                  gpio_calsw_2_0,
+    output                  gpio_ad5355_rfen,
+    input                   gpio_ad5355_lock,
 
-    output          enable,
-    output          txnrx,
+    input                   rx_clk_in_1_p,
+    input                   rx_clk_in_1_n,
+    input                   rx_frame_in_1_p,
+    input                   rx_frame_in_1_n,
+    input       [ 5:0]      rx_data_in_1_p,
+    input       [ 5:0]      rx_data_in_1_n,
+    output                  tx_clk_out_1_p,
+    output                  tx_clk_out_1_n,
+    output                  tx_frame_out_1_p,
+    output                  tx_frame_out_1_n,
+    output      [ 5:0]      tx_data_out_1_p,
+    output      [ 5:0]      tx_data_out_1_n,
+    input       [ 7:0]      gpio_status_1,
+    output      [ 3:0]      gpio_ctl_1,
+    output                  gpio_en_agc_1,
+    output                  gpio_resetb_1,
+    output                  enable_1,
+    output                  txnrx_1,
+    output                  gpio_debug_3_1,
+    output                  gpio_debug_4_1,
+    output                  gpio_calsw_3_1,
+    output                  gpio_calsw_4_1,
 
-    output          gpio_resetb,
-    output          gpio_sync,
-    output          gpio_en_agc,
-    output  [ 3:0]  gpio_ctl,
-    input   [ 7:0]  gpio_status,
+    output                  spi_ad9361_0,
+    output                  spi_ad9361_1,
+    output                  spi_ad5355,
+    output                  spi_clk,
+    output                  spi_mosi,
+    input                   spi_miso,
 
-    output          spi_csn,
-    output          spi_clk,
-    output          spi_mosi,
-    input           spi_miso
+    input                   ref_clk_p,
+    input                   ref_clk_n
   );
 
   // internal signals
-
-  wire    [94:0]  gpio_i;
-  wire    [94:0]  gpio_o;
   wire    [ 2:0]  spi0_csn;
 
   //PS TO PL / PL TO PS signals
@@ -138,18 +167,81 @@ module system_wrapper #(
 
   // defaults
 
-  assign gpio_resetb = gpio_o[46:46];
-  assign gpio_sync = gpio_o[45:45];
-  assign gpio_en_agc = gpio_o[44:44];
-  assign gpio_ctl = gpio_o[43:40];
+  // internal registers
+
+  reg     [  2:0] mcs_sync_m = 'd0;
+
+  // internal signals
+
+  wire            ref_clk_s;
+  wire            ref_clk_s_ds;
+  wire            ref_clk;
+  wire    [ 94:0] gpio_i;
+  wire    [ 94:0] gpio_o;
+  wire            gpio_sync;
+
+  // multi-chip synchronization
+
+  always @(posedge ref_clk or negedge s_axi_aresetn) begin
+    if (s_axi_aresetn == 1'b0) begin
+      mcs_sync_m <= 3'd0;
+      mcs_sync <= 1'd0;
+    end else begin
+      mcs_sync_m <= {mcs_sync_m[1:0], gpio_sync};
+      mcs_sync <= mcs_sync_m[2] & ~mcs_sync_m[1];
+    end
+  end
+
+  // instantiations
+
+  IBUFDS i_ref_clk_ibuf_ds (
+    .I (ref_clk_p),
+    .IB (ref_clk_n),
+    .O (ref_clk_s_ds));
+
+  BUFG i_ref_clk_ibuf (
+    .I (ref_clk_s_ds),
+    .O (ref_clk_s));
+
+  BUFR #(
+    .BUFR_DIVIDE ("BYPASS")
+  ) i_ref_clk_rbuf (
+    .CLR (1'b0),
+    .CE (1'b1),
+    .I (ref_clk_s),
+    .O (ref_clk));
+
+  assign gpio_resetb_1 = gpio_o[65];
+  assign gpio_ad5355_rfen = gpio_o[63];
+  assign gpio_calsw_4_1 = gpio_o[62];
+  assign gpio_calsw_3_1 = gpio_o[61];
+  assign gpio_calsw_2_0 = gpio_o[60];
+  assign gpio_calsw_1_0 = gpio_o[59];
+  assign gpio_txnrx_1 = gpio_o[58];
+  assign gpio_enable_1 = gpio_o[57];
+  assign gpio_en_agc_1 = gpio_o[56];
+  assign gpio_txnrx_0 = gpio_o[55];
+  assign gpio_enable_0 = gpio_o[54];
+  assign gpio_en_agc_0 = gpio_o[53];
+  assign gpio_resetb_0 = gpio_o[52];
+  assign gpio_sync = gpio_o[51];
+  assign gpio_debug_4_0 = gpio_o[49];
+  assign gpio_debug_3_0 = gpio_o[48];
+  assign gpio_debug_2_0 = gpio_o[47];
+  assign gpio_debug_1_0 = gpio_o[46];
+  assign gpio_ctl_1 = gpio_o[45:42];
+  assign gpio_ctl_0 = gpio_o[41:38];
   assign gpio_bd_o = gpio_o[20:13];
-
-  assign gpio_i[94:40] = gpio_o[94:40];
-  assign gpio_i[39:32] = gpio_status;
-  assign gpio_i[31:13] = gpio_o[31:13];
   assign gpio_i[12: 0] = gpio_bd_i;
+  assign gpio_i[21:13] = gpio_o[21:13];
+  assign gpio_i[29:22] = gpio_status_0;
+  assign gpio_i[37:30] = gpio_status_1;
+  assign gpio_i[63:38] = gpio_o[63:38];
+  assign gpio_i[64] = gpio_ad5355_lock;
+  assign gpio_i[94:65] = gpio_o[94:65];
 
-  assign spi_csn = spi0_csn[0];
+  assign gpio_debug_3_1 = 1'b0;
+  assign gpio_debug_4_1 = 1'b0;
 
   system_pl_wrapper #(
     .FPGA_TECHNOLOGY(FPGA_TECHNOLOGY),
@@ -165,7 +257,7 @@ module system_wrapper #(
     .axi_aresetn(s_axi_aresetn),
 
     .s_axi_awvalid(w_axi_awvalid),
-    .s_axi_awaddr(w_axi_awaddr[31:0]),
+    .s_axi_awaddr(w_axi_awaddr),
     .s_axi_awready(w_axi_awready),
     .s_axi_awprot(w_axi_awprot),
     .s_axi_wvalid(w_axi_wvalid),
@@ -176,7 +268,7 @@ module system_wrapper #(
     .s_axi_bresp(w_axi_bresp),
     .s_axi_bready(w_axi_bready),
     .s_axi_arvalid(w_axi_arvalid),
-    .s_axi_araddr(w_axi_araddr[31:0]),
+    .s_axi_araddr(w_axi_araddr),
     .s_axi_arready(w_axi_arready),
     .s_axi_arprot(w_axi_arprot),
     .s_axi_rvalid(w_axi_rvalid),
@@ -191,29 +283,54 @@ module system_wrapper #(
     //AD9361 IO
     //clocks
     .delay_clk(s_delay_clk),
+    //ID 0
     //RX LVDS
-    .rx_clk_in_p(rx_clk_in_p),
-    .rx_clk_in_n(rx_clk_in_n),
-    .rx_frame_in_p(rx_frame_in_p),
-    .rx_frame_in_n(rx_frame_in_n),
-    .rx_data_in_p(rx_data_in_p),
-    .rx_data_in_n(rx_data_in_n),
+    .rx_clk_in_0_p(rx_clk_in_0_p),
+    .rx_clk_in_0_n(rx_clk_in_0_n),
+    .rx_frame_in_0_p(rx_frame_in_0_p),
+    .rx_frame_in_0_n(rx_frame_in_0_n),
+    .rx_data_in_0_p(rx_data_in_0_p),
+    .rx_data_in_0_n(rx_data_in_0_n),
     //TX LVDS
-    .tx_clk_out_p(tx_clk_out_p),
-    .tx_clk_out_n(tx_clk_out_n),
-    .tx_frame_out_p(tx_frame_out_p),
-    .tx_frame_out_n(tx_frame_out_n),
-    .tx_data_out_p(tx_data_out_p),
-    .tx_data_out_n(tx_data_out_n),
+    .tx_clk_out_0_p(tx_clk_out_0_p),
+    .tx_clk_out_0_n(tx_clk_out_0_n),
+    .tx_frame_out_0_p(tx_frame_out_0_p),
+    .tx_frame_out_0_n(tx_frame_out_0_n),
+    .tx_data_out_0_p(tx_data_out_0_p),
+    .tx_data_out_0_n(tx_data_out_0_n),
     //MISC
-    .enable(enable),
-    .txnrx(txnrx),
-    .up_enable(gpio_o[47]),
-    .up_txnrx(gpio_o[48]),
+    .enable_0(enable_0),
+    .txnrx_0(txnrx_0),
+    .up_enable_0(gpio_enable_0),
+    .up_txnrx_0(gpio_txnrx_0),
     //sync
-    .tdd_sync_t(),
-    .tdd_sync_i(1'b0),
-    .tdd_sync_o(),
+    .tdd_sync_0_t(),
+    .tdd_sync_0_i(1'b0),
+    .tdd_sync_0_o(),
+    //ID 1
+    //RX LVDS
+    .rx_clk_in_1_p(rx_clk_in_1_p),
+    .rx_clk_in_1_n(rx_clk_in_1_n),
+    .rx_frame_in_1_p(rx_frame_in_1_p),
+    .rx_frame_in_1_n(rx_frame_in_1_n),
+    .rx_data_in_1_p(rx_data_in_1_p),
+    .rx_data_in_1_n(rx_data_in_1_n),
+    //TX LVDS
+    .tx_clk_out_1_p(tx_clk_out_1_p),
+    .tx_clk_out_1_n(tx_clk_out_1_n),
+    .tx_frame_out_1_p(tx_frame_out_1_p),
+    .tx_frame_out_1_n(tx_frame_out_1_n),
+    .tx_data_out_1_p(tx_data_out_1_p),
+    .tx_data_out_1_n(tx_data_out_1_n),
+    //MISC
+    .enable_1(enable_1),
+    .txnrx_1(txnrx_1),
+    .up_enable_1(gpio_enable_1),
+    .up_txnrx_1(gpio_txnrx_1),
+    //sync
+    .tdd_sync_1_t(),
+    .tdd_sync_1_i(1'b0),
+    .tdd_sync_1_o(),
 
     //axi interface for the adc to the hp interface
     .adc_m_dest_axi_awaddr(adc_hp0_axi_awaddr),
@@ -371,11 +488,12 @@ module system_wrapper #(
     .spi0_sclk_o(spi_clk),
     .spi0_sclk_t(),
     .spi0_so_t(),
-    .spi0_ss1_o_n(),
-    .spi0_ss2_o_n(),
+    .spi0_ss1_o_n(spi_ad9361_1),
+    .spi0_ss2_o_n(spi_ad5355),
     .spi0_ss_i_n(1'b1),
     .spi0_ss_n_t(),
-    .spi0_ss_o_n(spi_csn),
+    .spi0_ss_o_n(spi_ad9361_0),
+
     .spi1_m_i(1'b0),
     .spi1_m_o(),
     .spi1_mo_t(),

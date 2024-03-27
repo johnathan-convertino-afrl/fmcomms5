@@ -1,28 +1,12 @@
 CAPI=2:
 
-name : AFRL:project:fmcomms2-3:1.0.0
-description: AFRL conversion of fmcomms2-3 to fusesoc. This is a minimal system.
+name : AFRL:project:fmcomms5:1.0.0
+description: AFRL conversion of fmcomms5 to fusesoc. This is a minimal system.
 
 filesets:
-  src_ad9361_pl:
+  src_ad9361x2_pl:
     files:
-      - common/ad9361_pl_wrapper.v : {file_type : verilogSource}
-
-  zed:
-    files:
-      - zed/system_constr.xdc : {file_type : xdc}
-      - zed/system_wrapper.v : {file_type : verilogSource}
-      - zed/system_pl_wrapper.v : {file_type : verilogSource}
-      - zed/system_pl_gen.tcl : {file_type : tclSource}
-      - zed/system_gen.tcl : {file_type : tclSource}
-    depend:
-      - AFRL:utility:digilent_zed_board_base:1.0.0
-      - AFRL:utility:vivado_board_support_packages
-      - AD:common:ad_iobuf:1.0.0
-
-  zed_bootgen:
-    depend:
-      - AFRL:utility:digilent_zed_boot_gen:1.0.0
+      - common/ad9361x2_pl_wrapper.v : {file_type : verilogSource}
 
   zc706:
     files:
@@ -71,20 +55,6 @@ filesets:
     depend:
       - AFRL:utility:xilinx_zcu102_boot_gen:1.0.0
 
-  hanpilot:
-    files:
-      - hanpilot/system_constr.sdc : {file_type : SDC}
-      - hanpilot/system_wrapper.v : {file_type : verilogSource}
-      - hanpilot/system_pl_wrapper.v : {file_type : verilogSource}
-      - hanpilot/system_pl_gen.tcl : {file_type : tclSource}
-      - hanpilot/system_gen.tcl : {file_type : tclSource}
-    depend:
-      - AFRL:utility:terasic_hanpilot_board_base:1.0.0
-
-  hanpilot_bootgen:
-    depend:
-      - AFRL:utility:terasic_hanpilot_boot_gen:1.0.0
-
   a10soc:
     files:
       - a10soc/system_constr.sdc : {file_type : SDC}
@@ -117,30 +87,14 @@ targets:
 
   default: &default
     description: Default target, do not use.
-    filesets: [dep]
+    filesets: [dep, src_ad9361x2_pl]
     toplevel: system_wrapper
-
-  zed: &zed
-    <<: *default
-    default_tool: vivado
-    description: zedboard target.
-    filesets_append : [src_ad9361_pl, "tool_vivado ? (zed)"]
-    tools:
-      vivado:
-        source_mgmt_mode: DisplayOnly
-        board_part: avnet.com:zedboard:1.4
-        part: xc7z020clg484-1
-
-  zed_bootgen:
-    <<: *zed
-    description: zed build with boot.bin output in BOOTFS folder.
-    filesets_append : [zed_bootgen]
 
   zc706: &zc706
     <<: *default
     default_tool: vivado
     description: zc706 target.
-    filesets_append : [src_ad9361_pl, "tool_vivado ? (zc706)"]
+    filesets_append : ["tool_vivado ? (zc706)"]
     tools:
       vivado:
         source_mgmt_mode: DisplayOnly
@@ -156,7 +110,7 @@ targets:
     <<: *default
     default_tool: vivado
     description: zc702 target.
-    filesets_append : [src_ad9361_pl, "tool_vivado ? (zc702)"]
+    filesets_append : ["tool_vivado ? (zc702)"]
     tools:
       vivado:
         source_mgmt_mode: DisplayOnly
@@ -172,7 +126,7 @@ targets:
     <<: *default
     default_tool: vivado
     description: zcu102 target.
-    filesets_append : [src_ad9361_pl, "tool_vivado ? (zcu102)"]
+    filesets_append : ["tool_vivado ? (zcu102)"]
     tools:
       vivado:
         source_mgmt_mode: DisplayOnly
@@ -184,26 +138,11 @@ targets:
     description: zcu102 build with boot.bin output in BOOTFS folder.
     filesets_append : [zcu102_bootgen]
 
-  hanpilot: &hanpilot
-    <<: *default
-    default_tool: quartus
-    description: hanpilot target.
-    filesets_append : [src_ad9361_pl, "tool_quartus ? (hanpilot)"]
-    tools:
-      quartus:
-        family: Arria 10
-        device: 10AS066K3F40E2SG
-
-  hanpilot_bootgen:
-    <<: *hanpilot
-    description: hanpilot build with BOOTFS file generation.
-    filesets_append : [hanpilot_bootgen]
-
   a10soc: &a10soc
     <<: *default
     default_tool: quartus
     description: a10soc target.
-    filesets_append : [src_ad9361_pl, "tool_quartus ? (a10soc)"]
+    filesets_append : ["tool_quartus ? (a10soc)"]
     tools:
       quartus:
         family: Arria 10

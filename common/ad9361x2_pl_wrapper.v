@@ -1,11 +1,11 @@
 //******************************************************************************
-/// @FILE    ad9361_pl_wrapper.v
+/// @FILE    ad9361x2_pl_wrapper.v
 /// @AUTHOR  JAY CONVERTINO
-/// @DATE    2023.11.02
-/// @BRIEF   AD9361 core and support core wrapper.
+/// @DATE    2024.03.25
+/// @BRIEF   AD9361 dual core and support core wrapper.
 ///
 /// @LICENSE MIT
-///  Copyright 2023 Jay Convertino
+///  Copyright 2024 Jay Convertino
 ///
 ///  Permission is hereby granted, free of charge, to any person obtaining a copy
 ///  of this software and associated documentation files (the "Software"), to
@@ -26,7 +26,7 @@
 ///  IN THE SOFTWARE.
 //******************************************************************************
 
-module ad9361_pl_wrapper #(
+module ad9361x2_pl_wrapper #(
     parameter FPGA_TECHNOLOGY = 0,
     parameter FPGA_FAMILY = 0,
     parameter SPEED_GRADE = 0,
@@ -37,7 +37,8 @@ module ad9361_pl_wrapper #(
     parameter DMA_AXI_PROTOCOL_TO_PS = 1, //1 = AXI3, 0 = AXI4
     parameter AXI_DMAC_ADC_ADDR = 32'h7C400000,
     parameter AXI_DMAC_DAC_ADDR = 32'h7C420000,
-    parameter AXI_AD9361_ADDR = 32'h79020000
+    parameter AXI_AD9361_0_ADDR = 32'h79020000,
+    parameter AXI_AD9361_1_ADDR = 32'h79040000
   ) (
     //AXI4LITE SLAVE INTERFACE TO CROSSBAR
     input axi_aclk,
@@ -68,31 +69,57 @@ module ad9361_pl_wrapper #(
     output        dac_dma_irq,
 
     //AD9361 IO
+    //common
     //clocks
     input         delay_clk,
+    //ID 0
     //RX LVDS
-    input         rx_clk_in_p,
-    input         rx_clk_in_n,
-    input         rx_frame_in_p,
-    input         rx_frame_in_n,
-    input   [5:0] rx_data_in_p,
-    input   [5:0] rx_data_in_n,
+    input         rx_clk_in_0_p,
+    input         rx_clk_in_0_n,
+    input         rx_frame_in_0_p,
+    input         rx_frame_in_0_n,
+    input   [5:0] rx_data_in_0_p,
+    input   [5:0] rx_data_in_0_n,
     //TX LVDS
-    output        tx_clk_out_p,
-    output        tx_clk_out_n,
-    output        tx_frame_out_p,
-    output        tx_frame_out_n,
-    output  [5:0] tx_data_out_p,
-    output  [5:0] tx_data_out_n,
+    output        tx_clk_out_0_p,
+    output        tx_clk_out_0_n,
+    output        tx_frame_out_0_p,
+    output        tx_frame_out_0_n,
+    output  [5:0] tx_data_out_0_p,
+    output  [5:0] tx_data_out_0_n,
     //MISC
-    output        enable,
-    output        txnrx,
-    input         up_enable,
-    input         up_txnrx,
+    output        enable_0,
+    output        txnrx_0,
+    input         up_enable_0,
+    input         up_txnrx_0,
     //sync
-    output        tdd_sync_t,
-    input         tdd_sync_i,
-    output        tdd_sync_o,
+    output        tdd_sync_0_t,
+    input         tdd_sync_0_i,
+    output        tdd_sync_0_o,
+    //ID 1
+    //RX LVDS
+    input         rx_clk_in_1_p,
+    input         rx_clk_in_1_n,
+    input         rx_frame_in_1_p,
+    input         rx_frame_in_1_n,
+    input   [5:0] rx_data_in_1_p,
+    input   [5:0] rx_data_in_1_n,
+    //TX LVDS
+    output        tx_clk_out_1_p,
+    output        tx_clk_out_1_n,
+    output        tx_frame_out_1_p,
+    output        tx_frame_out_1_n,
+    output  [5:0] tx_data_out_1_p,
+    output  [5:0] tx_data_out_1_n,
+    //MISC
+    output        enable_1,
+    output        txnrx_1,
+    input         up_enable_1,
+    input         up_txnrx_1,
+    //sync
+    output        tdd_sync_1_t,
+    input         tdd_sync_1_i,
+    output        tdd_sync_1_o,
 
     //axi interface for the adc to the hp interface
     output [31:0]   adc_m_dest_axi_awaddr,
@@ -128,30 +155,53 @@ module ad9361_pl_wrapper #(
     input           dac_m_src_axi_rlast
   );
 
-  //AD9361 AXI4LITE bus signals
-  wire           ad9361_axi_awvalid;
-  wire   [31:0]  ad9361_axi_awaddr;
-  wire   [ 2:0]  ad9361_axi_awprot;
-  wire           ad9361_axi_awready;
-  wire           ad9361_axi_wvalid;
-  wire   [31:0]  ad9361_axi_wdata;
-  wire   [ 3:0]  ad9361_axi_wstrb;
-  wire           ad9361_axi_wready;
-  wire           ad9361_axi_bvalid;
-  wire   [ 1:0]  ad9361_axi_bresp;
-  wire           ad9361_axi_bready;
-  wire           ad9361_axi_arvalid;
-  wire   [31:0]  ad9361_axi_araddr;
-  wire   [ 2:0]  ad9361_axi_arprot;
-  wire           ad9361_axi_arready;
-  wire           ad9361_axi_rvalid;
-  wire   [31:0]  ad9361_axi_rdata;
-  wire   [ 1:0]  ad9361_axi_rresp;
-  wire           ad9361_axi_rready;
+  //AD9361 ID 0 AXI4LITE bus signals
+  wire           ad9361_0_axi_awvalid;
+  wire   [31:0]  ad9361_0_axi_awaddr;
+  wire   [ 2:0]  ad9361_0_axi_awprot;
+  wire           ad9361_0_axi_awready;
+  wire           ad9361_0_axi_wvalid;
+  wire   [31:0]  ad9361_0_axi_wdata;
+  wire   [ 3:0]  ad9361_0_axi_wstrb;
+  wire           ad9361_0_axi_wready;
+  wire           ad9361_0_axi_bvalid;
+  wire   [ 1:0]  ad9361_0_axi_bresp;
+  wire           ad9361_0_axi_bready;
+  wire           ad9361_0_axi_arvalid;
+  wire   [31:0]  ad9361_0_axi_araddr;
+  wire   [ 2:0]  ad9361_0_axi_arprot;
+  wire           ad9361_0_axi_arready;
+  wire           ad9361_0_axi_rvalid;
+  wire   [31:0]  ad9361_0_axi_rdata;
+  wire   [ 1:0]  ad9361_0_axi_rresp;
+  wire           ad9361_0_axi_rready;
+
+  //AD9361 ID 1 AXI4LITE bus signals
+  wire           ad9361_1_axi_awvalid;
+  wire   [31:0]  ad9361_1_axi_awaddr;
+  wire   [ 2:0]  ad9361_1_axi_awprot;
+  wire           ad9361_1_axi_awready;
+  wire           ad9361_1_axi_wvalid;
+  wire   [31:0]  ad9361_1_axi_wdata;
+  wire   [ 3:0]  ad9361_1_axi_wstrb;
+  wire           ad9361_1_axi_wready;
+  wire           ad9361_1_axi_bvalid;
+  wire   [ 1:0]  ad9361_1_axi_bresp;
+  wire           ad9361_1_axi_bready;
+  wire           ad9361_1_axi_arvalid;
+  wire   [31:0]  ad9361_1_axi_araddr;
+  wire   [ 2:0]  ad9361_1_axi_arprot;
+  wire           ad9361_1_axi_arready;
+  wire           ad9361_1_axi_rvalid;
+  wire   [31:0]  ad9361_1_axi_rdata;
+  wire   [ 1:0]  ad9361_1_axi_rresp;
+  wire           ad9361_1_axi_rready;
 
   //AD9361 general signals
-  wire dac_r1_mode;
-  wire adc_r1_mode;
+  wire dac_r1_mode_0;
+  wire adc_r1_mode_0;
+  wire dac_r1_mode_1;
+  wire adc_r1_mode_1;
   wire l_clk;
 
   //DAC DMA AXI4LITE bus signals
@@ -196,7 +246,7 @@ module ad9361_pl_wrapper #(
   wire   [ 1:0]  adc_dma_axi_rresp;
   wire           adc_dma_axi_rready;
 
-  //ADC FIFO signals to AD9361
+  //ADC FIFO signals to AD9361 ID 0
   wire           adc_enable_i0;
   wire           adc_valid_i0;
   wire  [15:0]   adc_data_i0;
@@ -209,9 +259,24 @@ module ad9361_pl_wrapper #(
   wire           adc_enable_q1;
   wire           adc_valid_q1;
   wire  [15:0]   adc_data_q1;
+  //ADC FIFO signals to AD9361 ID 1
+  wire           adc_enable_i2;
+  wire           adc_valid_i2;
+  wire  [15:0]   adc_data_i2;
+  wire           adc_enable_q2;
+  wire           adc_valid_q2;
+  wire  [15:0]   adc_data_q2;
+  wire           adc_enable_i3;
+  wire           adc_valid_i3;
+  wire  [15:0]   adc_data_i3;
+  wire           adc_enable_q3;
+  wire           adc_valid_q3;
+  wire  [15:0]   adc_data_q3;
+  //common
   wire           din_ovf;
 
   //ADC FIFO signals to adc pack
+  // ID 0
   wire           fifo_adc_enable_i0;
   wire           fifo_adc_valid_i0;
   wire  [15:0]   fifo_adc_data_i0;
@@ -224,17 +289,30 @@ module ad9361_pl_wrapper #(
   wire           fifo_adc_enable_q1;
   wire           fifo_adc_valid_q1;
   wire  [15:0]   fifo_adc_data_q1;
+  // ID 1
+  wire           fifo_adc_enable_i2;
+  wire           fifo_adc_valid_i2;
+  wire  [15:0]   fifo_adc_data_i2;
+  wire           fifo_adc_enable_q2;
+  wire           fifo_adc_valid_q2;
+  wire  [15:0]   fifo_adc_data_q2;
+  wire           fifo_adc_enable_i3;
+  wire           fifo_adc_valid_i3;
+  wire  [15:0]   fifo_adc_data_i3;
+  wire           fifo_adc_enable_q3;
+  wire           fifo_adc_valid_q3;
+  wire  [15:0]   fifo_adc_data_q3;
+  //common
   wire           fifo_dout_ovf;
-
   wire           fifo_wr_en;
 
   //ADC PACK signals to ADC DMA
   wire           packed_fifo_wr_en;
-  wire [63:0]    packed_fifo_wr_data;
+  wire [127:0]   packed_fifo_wr_data;
   wire           packed_fifo_wr_sync;
   wire           packed_fifo_wr_overflow;
 
-  //DAC FIFO signals to AD9361
+  //DAC FIFO signals to AD9361 ID 0
   wire           dac_enable_i0;
   wire           dac_valid_i0;
   wire  [15:0]   dac_data_i0;
@@ -247,9 +325,24 @@ module ad9361_pl_wrapper #(
   wire           dac_enable_q1;
   wire           dac_valid_q1;
   wire  [15:0]   dac_data_q1;
+  //DAC FIFO signals to AD9361 ID 1
+  wire           dac_enable_i2;
+  wire           dac_valid_i2;
+  wire  [15:0]   dac_data_i2;
+  wire           dac_enable_q2;
+  wire           dac_valid_q2;
+  wire  [15:0]   dac_data_q2;
+  wire           dac_enable_i3;
+  wire           dac_valid_i3;
+  wire  [15:0]   dac_data_i3;
+  wire           dac_enable_q3;
+  wire           dac_valid_q3;
+  wire  [15:0]   dac_data_q3;
+  //common
   wire           dac_dunf;
 
   //DAC FIFO signals to upack
+  // ID 0
   wire           fifo_dac_enable_i0;
   wire           fifo_dac_valid_i0;
   wire  [15:0]   fifo_dac_data_i0;
@@ -262,16 +355,35 @@ module ad9361_pl_wrapper #(
   wire           fifo_dac_enable_q1;
   wire           fifo_dac_valid_q1;
   wire  [15:0]   fifo_dac_data_q1;
-  wire           fifo_din_unf;
-  wire           fifo_rd_valid;
   wire           fifo_din_enable_i0;
   wire           fifo_din_enable_q0;
   wire           fifo_din_enable_i1;
   wire           fifo_din_enable_q1;
+  // ID 1
+  wire           fifo_dac_enable_i2;
+  wire           fifo_dac_valid_i2;
+  wire  [15:0]   fifo_dac_data_i2;
+  wire           fifo_dac_enable_q2;
+  wire           fifo_dac_valid_q2;
+  wire  [15:0]   fifo_dac_data_q2;
+  wire           fifo_dac_enable_i3;
+  wire           fifo_dac_valid_i3;
+  wire  [15:0]   fifo_dac_data_i3;
+  wire           fifo_dac_enable_q3;
+  wire           fifo_dac_valid_q3;
+  wire  [15:0]   fifo_dac_data_q3;
+  wire           fifo_din_enable_i2;
+  wire           fifo_din_enable_q2;
+  wire           fifo_din_enable_i3;
+  wire           fifo_din_enable_q3;
+  //common
+  wire           fifo_din_unf;
+  wire           fifo_rd_valid;
+
   //DMA to upack signals
   wire           fifo_s_axis_valid;
   wire           fifo_s_axis_ready;
-  wire  [63:0]   fifo_s_axis_data;
+  wire  [127:0]  fifo_s_axis_data;
 
   //inst_clkdiv
   wire d_clk;
@@ -279,17 +391,23 @@ module ad9361_pl_wrapper #(
   //reset signals
   wire p_reset;
   wire p_aresetn;
-  wire tdd_sync_cntr;
+  wire tdd_sync_cntr_0;
+  wire tdd_sync_cntr_1;
   wire ad_reset_o;
 
   //sync signals
-  wire sync_out;
+  wire sync_out_0;
+  wire sync_out_1;
+  wire dac_sync_out;
 
   //wiring
-  assign tdd_sync_t = tdd_sync_cntr;
-  assign tdd_sync_o = sync_out;
+  assign tdd_sync_0_t = tdd_sync_cntr_0;
+  assign tdd_sync_0_o = sync_out_0;
 
-  assign fifo_wr_en = fifo_adc_valid_i0 | fifo_adc_valid_i1 | fifo_adc_valid_q0 | fifo_adc_valid_q1;
+  assign tdd_sync_1_t = tdd_sync_cntr_1;
+  assign tdd_sync_1_o = sync_out_1;
+
+  assign fifo_wr_en = fifo_adc_valid_i0 | fifo_adc_valid_i1 | fifo_adc_valid_q0 | fifo_adc_valid_q1 | fifo_adc_valid_i2 | fifo_adc_valid_q2 | fifo_adc_valid_i3 | fifo_adc_valid_q3;
 
   axi_ad9361 #(
     // parameters
@@ -318,21 +436,21 @@ module ad9361_pl_wrapper #(
     .DAC_DDS_CORDIC_PHASE_DW(13),
     .DAC_USERPORTS_DISABLE(0),
     .DAC_IQCORRECTION_DISABLE(0),
-    .IO_DELAY_GROUP("dev_if_delay_group"),
+    .IO_DELAY_GROUP("dev_0_if_delay_group"),
     // .IODELAY_CTRL(1),
     .MIMO_ENABLE(0),
     .USE_SSI_CLK(1),
     .DELAY_REFCLK_FREQUENCY(DELAY_REFCLK_FREQUENCY),
     .RX_NODPA(0)
-  ) inst_axi_ad9361 (
+  ) inst_axi_ad9361_0 (
 
     // physical interface (receive-lvds)
-    .rx_clk_in_p(rx_clk_in_p),
-    .rx_clk_in_n(rx_clk_in_n),
-    .rx_frame_in_p(rx_frame_in_p),
-    .rx_frame_in_n(rx_frame_in_n),
-    .rx_data_in_p(rx_data_in_p),
-    .rx_data_in_n(rx_data_in_n),
+    .rx_clk_in_p(rx_clk_in_0_p),
+    .rx_clk_in_n(rx_clk_in_0_n),
+    .rx_frame_in_p(rx_frame_in_0_p),
+    .rx_frame_in_n(rx_frame_in_0_n),
+    .rx_data_in_p(rx_data_in_0_p),
+    .rx_data_in_n(rx_data_in_0_n),
 
     // physical interface (receive-cmos) NOT USED
     .rx_clk_in(1'b0),
@@ -340,12 +458,12 @@ module ad9361_pl_wrapper #(
     .rx_data_in(0),
 
     // physical interface (transmit-lvds)
-    .tx_clk_out_p(tx_clk_out_p),
-    .tx_clk_out_n(tx_clk_out_n),
-    .tx_frame_out_p(tx_frame_out_p),
-    .tx_frame_out_n(tx_frame_out_n),
-    .tx_data_out_p(tx_data_out_p),
-    .tx_data_out_n(tx_data_out_n),
+    .tx_clk_out_p(tx_clk_out_0_p),
+    .tx_clk_out_n(tx_clk_out_0_n),
+    .tx_frame_out_p(tx_frame_out_0_p),
+    .tx_frame_out_n(tx_frame_out_0_n),
+    .tx_data_out_p(tx_data_out_0_p),
+    .tx_data_out_n(tx_data_out_0_n),
 
     // physical interface (transmit-cmos) NOT USED
     .tx_clk_out(),
@@ -353,16 +471,16 @@ module ad9361_pl_wrapper #(
     .tx_data_out(),
 
     // ensm control
-    .enable(enable),
-    .txnrx(txnrx),
+    .enable(enable_0),
+    .txnrx(txnrx_0),
 
-    // transmit master/slave NOT USED
-    .dac_sync_in(1'b0),
-    .dac_sync_out(),
+    // transmit master/slave
+    .dac_sync_in(dac_sync_out),
+    .dac_sync_out(dac_sync_out),
 
     // tdd sync
-    .tdd_sync(sync_out),
-    .tdd_sync_cntr(tdd_sync_cntr),
+    .tdd_sync(sync_out_0),
+    .tdd_sync_cntr(tdd_sync_cntr_0),
 
     //gps NOT USED
     .gps_pps(1'b0),
@@ -390,7 +508,7 @@ module ad9361_pl_wrapper #(
     .adc_valid_q1(adc_valid_q1),
     .adc_data_q1(adc_data_q1),
     .adc_dovf(din_ovf),
-    .adc_r1_mode(adc_r1_mode),
+    .adc_r1_mode(adc_r1_mode_0),
 
     .dac_enable_i0(dac_enable_i0),
     .dac_valid_i0(dac_valid_i0),
@@ -405,44 +523,191 @@ module ad9361_pl_wrapper #(
     .dac_valid_q1(dac_valid_q1),
     .dac_data_q1(dac_data_q1),
     .dac_dunf(dac_dunf),
-    .dac_r1_mode(dac_r1_mode),
+    .dac_r1_mode(dac_r1_mode_0),
 
     // axi interface
     .s_axi_aclk(axi_aclk),
     .s_axi_aresetn(axi_aresetn),
-    .s_axi_awvalid(ad9361_axi_awvalid),
-    .s_axi_awaddr(ad9361_axi_awaddr[15:0]),
-    .s_axi_awprot(ad9361_axi_awprot),
-    .s_axi_awready(ad9361_axi_awready),
-    .s_axi_wvalid(ad9361_axi_wvalid),
-    .s_axi_wdata(ad9361_axi_wdata),
-    .s_axi_wstrb(ad9361_axi_wstrb),
-    .s_axi_wready(ad9361_axi_wready),
-    .s_axi_bvalid(ad9361_axi_bvalid),
-    .s_axi_bresp(ad9361_axi_bresp),
-    .s_axi_bready(ad9361_axi_bready),
-    .s_axi_arvalid(ad9361_axi_arvalid),
-    .s_axi_araddr(ad9361_axi_araddr[15:0]),
-    .s_axi_arprot(ad9361_axi_arprot),
-    .s_axi_arready(ad9361_axi_arready),
-    .s_axi_rvalid(ad9361_axi_rvalid),
-    .s_axi_rdata(ad9361_axi_rdata),
-    .s_axi_rresp(ad9361_axi_rresp),
-    .s_axi_rready(ad9361_axi_rready),
+    .s_axi_awvalid(ad9361_0_axi_awvalid),
+    .s_axi_awaddr(ad9361_0_axi_awaddr[15:0]),
+    .s_axi_awprot(ad9361_0_axi_awprot),
+    .s_axi_awready(ad9361_0_axi_awready),
+    .s_axi_wvalid(ad9361_0_axi_wvalid),
+    .s_axi_wdata(ad9361_0_axi_wdata),
+    .s_axi_wstrb(ad9361_0_axi_wstrb),
+    .s_axi_wready(ad9361_0_axi_wready),
+    .s_axi_bvalid(ad9361_0_axi_bvalid),
+    .s_axi_bresp(ad9361_0_axi_bresp),
+    .s_axi_bready(ad9361_0_axi_bready),
+    .s_axi_arvalid(ad9361_0_axi_arvalid),
+    .s_axi_araddr(ad9361_0_axi_araddr[15:0]),
+    .s_axi_arprot(ad9361_0_axi_arprot),
+    .s_axi_arready(ad9361_0_axi_arready),
+    .s_axi_rvalid(ad9361_0_axi_rvalid),
+    .s_axi_rdata(ad9361_0_axi_rdata),
+    .s_axi_rresp(ad9361_0_axi_rresp),
+    .s_axi_rready(ad9361_0_axi_rready),
 
     // gpio
-    .up_enable(up_enable),
-    .up_txnrx(up_txnrx),
+    .up_enable(up_enable_0),
+    .up_txnrx(up_txnrx_0),
     .up_dac_gpio_in(0),
     .up_dac_gpio_out(),
     .up_adc_gpio_in(0),
     .up_adc_gpio_out()
   );
 
+  axi_ad9361 #(
+    // parameters
+    .ID(1),
+    .MODE_1R1T(0),
+    .FPGA_TECHNOLOGY(FPGA_TECHNOLOGY),
+    .FPGA_FAMILY(FPGA_FAMILY),
+    .SPEED_GRADE(SPEED_GRADE),
+    .DEV_PACKAGE(DEV_PACKAGE),
+    .TDD_DISABLE(1),
+    .PPS_RECEIVER_ENABLE(0),
+    .CMOS_OR_LVDS_N(0),
+    .ADC_INIT_DELAY(ADC_INIT_DELAY),
+    .ADC_DATAPATH_DISABLE(0),
+    .ADC_USERPORTS_DISABLE(0),
+    .ADC_DATAFORMAT_DISABLE(0),
+    .ADC_DCFILTER_DISABLE(0),
+    .ADC_IQCORRECTION_DISABLE(0),
+    .DAC_INIT_DELAY(DAC_INIT_DELAY),
+    .DAC_CLK_EDGE_SEL(0),
+    .DAC_IODELAY_ENABLE(0),
+    .DAC_DATAPATH_DISABLE(0),
+    .DAC_DDS_DISABLE(0),
+    .DAC_DDS_TYPE(1),
+    .DAC_DDS_CORDIC_DW(14),
+    .DAC_DDS_CORDIC_PHASE_DW(13),
+    .DAC_USERPORTS_DISABLE(0),
+    .DAC_IQCORRECTION_DISABLE(0),
+    .IO_DELAY_GROUP("dev_1_if_delay_group"),
+    // .IODELAY_CTRL(1),
+    .MIMO_ENABLE(0),
+    .USE_SSI_CLK(1),
+    .DELAY_REFCLK_FREQUENCY(DELAY_REFCLK_FREQUENCY),
+    .RX_NODPA(0)
+  ) inst_axi_ad9361_1 (
+
+    // physical interface (receive-lvds)
+    .rx_clk_in_p(rx_clk_in_1_p),
+    .rx_clk_in_n(rx_clk_in_1_n),
+    .rx_frame_in_p(rx_frame_in_1_p),
+    .rx_frame_in_n(rx_frame_in_1_n),
+    .rx_data_in_p(rx_data_in_1_p),
+    .rx_data_in_n(rx_data_in_1_n),
+
+    // physical interface (receive-cmos) NOT USED
+    .rx_clk_in(1'b0),
+    .rx_frame_in(1'b0),
+    .rx_data_in(0),
+
+    // physical interface (transmit-lvds)
+    .tx_clk_out_p(tx_clk_out_1_p),
+    .tx_clk_out_n(tx_clk_out_1_n),
+    .tx_frame_out_p(tx_frame_out_1_p),
+    .tx_frame_out_n(tx_frame_out_1_n),
+    .tx_data_out_p(tx_data_out_1_p),
+    .tx_data_out_n(tx_data_out_1_n),
+
+    // physical interface (transmit-cmos) NOT USED
+    .tx_clk_out(),
+    .tx_frame_out(),
+    .tx_data_out(),
+
+    // ensm control
+    .enable(enable_1),
+    .txnrx(txnrx_1),
+
+    // transmit master/slave NOT USED
+    .dac_sync_in(dac_sync_out),
+    .dac_sync_out(),
+
+    // tdd sync
+    .tdd_sync(sync_out_1),
+    .tdd_sync_cntr(tdd_sync_cntr_1),
+
+    //gps NOT USED
+    .gps_pps(1'b0),
+    .gps_pps_irq(),
+
+    // delay clock
+    .delay_clk(delay_clk),
+
+    // master interface
+    .l_clk(),
+    .clk(l_clk),
+    .rst(),
+
+    // dma interface
+    .adc_enable_i0(adc_enable_i2),
+    .adc_valid_i0(adc_valid_i2),
+    .adc_data_i0(adc_data_i2),
+    .adc_enable_q0(adc_enable_q2),
+    .adc_valid_q0(adc_valid_q2),
+    .adc_data_q0(adc_data_q2),
+    .adc_enable_i1(adc_enable_i3),
+    .adc_valid_i1(adc_valid_i3),
+    .adc_data_i1(adc_data_i3),
+    .adc_enable_q1(adc_enable_q3),
+    .adc_valid_q1(adc_valid_q3),
+    .adc_data_q1(adc_data_q3),
+    .adc_dovf(din_ovf),
+    .adc_r1_mode(adc_r1_mode_1),
+
+    .dac_enable_i0(dac_enable_i2),
+    .dac_valid_i0(dac_valid_i2),
+    .dac_data_i0(dac_data_i2),
+    .dac_enable_q0(dac_enable_q2),
+    .dac_valid_q0(dac_valid_q2),
+    .dac_data_q0(dac_data_q2),
+    .dac_enable_i1(dac_enable_i3),
+    .dac_valid_i1(dac_valid_i3),
+    .dac_data_i1(dac_data_i3),
+    .dac_enable_q1(dac_enable_q3),
+    .dac_valid_q1(dac_valid_q3),
+    .dac_data_q1(dac_data_q3),
+    .dac_dunf(dac_dunf),
+    .dac_r1_mode(dac_r1_mode_1),
+
+    // axi interface
+    .s_axi_aclk(axi_aclk),
+    .s_axi_aresetn(axi_aresetn),
+    .s_axi_awvalid(ad9361_1_axi_awvalid),
+    .s_axi_awaddr(ad9361_1_axi_awaddr[15:0]),
+    .s_axi_awprot(ad9361_1_axi_awprot),
+    .s_axi_awready(ad9361_1_axi_awready),
+    .s_axi_wvalid(ad9361_1_axi_wvalid),
+    .s_axi_wdata(ad9361_1_axi_wdata),
+    .s_axi_wstrb(ad9361_1_axi_wstrb),
+    .s_axi_wready(ad9361_1_axi_wready),
+    .s_axi_bvalid(ad9361_1_axi_bvalid),
+    .s_axi_bresp(ad9361_1_axi_bresp),
+    .s_axi_bready(ad9361_1_axi_bready),
+    .s_axi_arvalid(ad9361_1_axi_arvalid),
+    .s_axi_araddr(ad9361_1_axi_araddr[15:0]),
+    .s_axi_arprot(ad9361_1_axi_arprot),
+    .s_axi_arready(ad9361_1_axi_arready),
+    .s_axi_rvalid(ad9361_1_axi_rvalid),
+    .s_axi_rdata(ad9361_1_axi_rdata),
+    .s_axi_rresp(ad9361_1_axi_rresp),
+    .s_axi_rready(ad9361_1_axi_rready),
+
+    // gpio
+    .up_enable(up_enable_1),
+    .up_txnrx(up_txnrx_1),
+    .up_dac_gpio_in(0),
+    .up_dac_gpio_out(),
+    .up_adc_gpio_in(0),
+    .up_adc_gpio_out()
+  );
 
   axi_dmac #(
     .ID(0),
-    .DMA_DATA_WIDTH_SRC(64),
+    .DMA_DATA_WIDTH_SRC(128),
     .DMA_DATA_WIDTH_DEST(64),
     .DMA_LENGTH_WIDTH(24),
     .DMA_2D_TRANSFER(0),
@@ -640,7 +905,7 @@ module ad9361_pl_wrapper #(
   axi_dmac #(
     .ID(0),
     .DMA_DATA_WIDTH_SRC(64),
-    .DMA_DATA_WIDTH_DEST(64),
+    .DMA_DATA_WIDTH_DEST(128),
     .DMA_LENGTH_WIDTH(24),
     .DMA_2D_TRANSFER(0),
     .ASYNC_CLK_REQ_SRC(0),
@@ -834,7 +1099,7 @@ module ad9361_pl_wrapper #(
   );
 
   util_cpack2 #(
-    .NUM_OF_CHANNELS(4),
+    .NUM_OF_CHANNELS(8),
     .SAMPLES_PER_CHANNEL(1),
     .SAMPLE_DATA_WIDTH(16)
   ) inst_adc_cpack (
@@ -846,10 +1111,10 @@ module ad9361_pl_wrapper #(
     .enable_1(fifo_adc_enable_q0),
     .enable_2(fifo_adc_enable_i1),
     .enable_3(fifo_adc_enable_q1),
-    .enable_4(1'b0),
-    .enable_5(1'b0),
-    .enable_6(1'b0),
-    .enable_7(1'b0),
+    .enable_4(fifo_adc_enable_i2),
+    .enable_5(fifo_adc_enable_q2),
+    .enable_6(fifo_adc_enable_i3),
+    .enable_7(fifo_adc_enable_q3),
     .enable_8(1'b0),
     .enable_9(1'b0),
     .enable_10(1'b0),
@@ -914,10 +1179,10 @@ module ad9361_pl_wrapper #(
     .fifo_wr_data_1(fifo_adc_data_q0),
     .fifo_wr_data_2(fifo_adc_data_i1),
     .fifo_wr_data_3(fifo_adc_data_q1),
-    .fifo_wr_data_4(0),
-    .fifo_wr_data_5(0),
-    .fifo_wr_data_6(0),
-    .fifo_wr_data_7(0),
+    .fifo_wr_data_4(fifo_adc_data_i2),
+    .fifo_wr_data_5(fifo_adc_data_q2),
+    .fifo_wr_data_6(fifo_adc_data_i3),
+    .fifo_wr_data_7(fifo_adc_data_q3),
     .fifo_wr_data_8(0),
     .fifo_wr_data_9(0),
     .fifo_wr_data_10(0),
@@ -982,7 +1247,7 @@ module ad9361_pl_wrapper #(
   );
 
   util_upack2 #(
-    .NUM_OF_CHANNELS(4),
+    .NUM_OF_CHANNELS(8),
     .SAMPLES_PER_CHANNEL(1),
     .SAMPLE_DATA_WIDTH(16)
   ) inst_dac_upack (
@@ -994,10 +1259,10 @@ module ad9361_pl_wrapper #(
     .enable_1(fifo_din_enable_q0),
     .enable_2(fifo_din_enable_i1),
     .enable_3(fifo_din_enable_q1),
-    .enable_4(1'b0),
-    .enable_5(1'b0),
-    .enable_6(1'b0),
-    .enable_7(1'b0),
+    .enable_4(fifo_din_enable_i2),
+    .enable_5(fifo_din_enable_q2),
+    .enable_6(fifo_din_enable_i3),
+    .enable_7(fifo_din_enable_q3),
     .enable_8(1'b0),
     .enable_9(1'b0),
     .enable_10(1'b0),
@@ -1055,7 +1320,7 @@ module ad9361_pl_wrapper #(
     .enable_62(1'b0),
     .enable_63(1'b0),
 
-    .fifo_rd_en(fifo_dac_valid_i0 | fifo_dac_valid_q0 | fifo_dac_valid_i1 | fifo_dac_valid_q1),
+    .fifo_rd_en(fifo_dac_valid_i0 | fifo_dac_valid_q0 | fifo_dac_valid_i1 | fifo_dac_valid_q1 | fifo_dac_valid_i2 | fifo_dac_valid_q2 | fifo_dac_valid_i3 | fifo_dac_valid_q3),
     .fifo_rd_valid(fifo_rd_valid),
     .fifo_rd_underflow(fifo_din_unf),
 
@@ -1063,10 +1328,10 @@ module ad9361_pl_wrapper #(
     .fifo_rd_data_1(fifo_dac_data_q0),
     .fifo_rd_data_2(fifo_dac_data_i1),
     .fifo_rd_data_3(fifo_dac_data_q1),
-    .fifo_rd_data_4(),
-    .fifo_rd_data_5(),
-    .fifo_rd_data_6(),
-    .fifo_rd_data_7(),
+    .fifo_rd_data_4(fifo_dac_data_i2),
+    .fifo_rd_data_5(fifo_dac_data_q2),
+    .fifo_rd_data_6(fifo_dac_data_i3),
+    .fifo_rd_data_7(fifo_dac_data_q3),
     .fifo_rd_data_8(),
     .fifo_rd_data_9(),
     .fifo_rd_data_10(),
@@ -1130,7 +1395,7 @@ module ad9361_pl_wrapper #(
   );
 
   util_rfifo #(
-    .NUM_OF_CHANNELS(4),
+    .NUM_OF_CHANNELS(8),
     .DIN_DATA_WIDTH(16),
     .DOUT_DATA_WIDTH(16),
     .DIN_ADDRESS_WIDTH(4)
@@ -1156,22 +1421,22 @@ module ad9361_pl_wrapper #(
     .din_valid_3(fifo_dac_valid_q1),
     .din_valid_in_3(fifo_rd_valid),
     .din_data_3(fifo_dac_data_q1),
-    .din_enable_4(),
-    .din_valid_4(),
-    .din_valid_in_4(1'b0),
-    .din_data_4(0),
-    .din_enable_5(),
-    .din_valid_5(),
-    .din_valid_in_5(1'b0),
-    .din_data_5(0),
-    .din_enable_6(),
-    .din_valid_6(),
-    .din_valid_in_6(1'b0),
-    .din_data_6(0),
-    .din_enable_7(),
-    .din_valid_7(),
-    .din_valid_in_7(1'b0),
-    .din_data_7(0),
+    .din_enable_4(fifo_din_enable_i2),
+    .din_valid_4(fifo_dac_valid_i2),
+    .din_valid_in_4(fifo_rd_valid),
+    .din_data_4(fifo_dac_data_i2),
+    .din_enable_5(fifo_din_enable_q2),
+    .din_valid_5(fifo_dac_valid_q2),
+    .din_valid_in_5(fifo_rd_valid),
+    .din_data_5(fifo_dac_data_q2),
+    .din_enable_6(fifo_din_enable_i3),
+    .din_valid_6(fifo_dac_valid_i3),
+    .din_valid_in_6(fifo_rd_valid),
+    .din_data_6(fifo_dac_data_i3),
+    .din_enable_7(fifo_din_enable_q3),
+    .din_valid_7(fifo_dac_valid_q3),
+    .din_valid_in_7(fifo_r_valid),
+    .din_data_7(fifo_dac_data_q3),
     .din_unf(fifo_din_unf),
 
     // d-out interface
@@ -1194,27 +1459,27 @@ module ad9361_pl_wrapper #(
     .dout_valid_3(dac_valid_q1),
     .dout_valid_out_3(),
     .dout_data_3(dac_data_q1),
-    .dout_enable_4(1'b0),
-    .dout_valid_4(1'b0),
+    .dout_enable_4(dac_enable_i2),
+    .dout_valid_4(dac_valid_i2),
     .dout_valid_out_4(),
-    .dout_data_4(),
-    .dout_enable_5(1'b0),
-    .dout_valid_5(1'b0),
+    .dout_data_4(dac_data_i2),
+    .dout_enable_5(dac_enable_q2),
+    .dout_valid_5(dac_valid_q2),
     .dout_valid_out_5(),
-    .dout_data_5(),
-    .dout_enable_6(1'b0),
-    .dout_valid_6(1'b0),
+    .dout_data_5(dac_data_q2),
+    .dout_enable_6(dac_enable_i3),
+    .dout_valid_6(dac_valid_i3),
     .dout_valid_out_6(),
-    .dout_data_6(),
-    .dout_enable_7(1'b0),
-    .dout_valid_7(1'b0),
+    .dout_data_6(dac_data_i3),
+    .dout_enable_7(dac_enable_q3),
+    .dout_valid_7(dac_valid_q3),
     .dout_valid_out_7(),
-    .dout_data_7(),
+    .dout_data_7(dac_data_q3),
     .dout_unf(dac_dunf)
   );
 
   util_wfifo #(
-    .NUM_OF_CHANNELS(4),
+    .NUM_OF_CHANNELS(8),
     .DIN_DATA_WIDTH(16),
     .DOUT_DATA_WIDTH(16),
     .DIN_ADDRESS_WIDTH(4)
@@ -1236,18 +1501,18 @@ module ad9361_pl_wrapper #(
     .din_enable_3(adc_enable_q1),
     .din_valid_3(adc_valid_q1),
     .din_data_3(adc_data_q1),
-    .din_enable_4(1'b0),
-    .din_valid_4(1'b0),
-    .din_data_4(0),
-    .din_enable_5(1'b0),
-    .din_valid_5(1'b0),
-    .din_data_5(0),
-    .din_enable_6(1'b0),
-    .din_valid_6(1'b0),
-    .din_data_6(0),
-    .din_enable_7(1'b0),
-    .din_valid_7(1'b0),
-    .din_data_7(0),
+    .din_enable_4(adc_enable_i2),
+    .din_valid_4(adc_valid_i2),
+    .din_data_4(adc_data_i2),
+    .din_enable_5(adc_enable_q2),
+    .din_valid_5(adc_valid_q2),
+    .din_data_5(adc_data_q2),
+    .din_enable_6(adc_enable_i3),
+    .din_valid_6(adc_valid_i3),
+    .din_data_6(adc_data_i3),
+    .din_enable_7(adc_enable_q3),
+    .din_valid_7(adc_valid_q3),
+    .din_data_7(adc_data_q3),
     .din_ovf(din_ovf),
 
     // d-out interface
@@ -1266,35 +1531,45 @@ module ad9361_pl_wrapper #(
     .dout_enable_3(fifo_adc_enable_q1),
     .dout_valid_3(fifo_adc_valid_q1),
     .dout_data_3(fifo_adc_data_q1),
-    .dout_enable_4(),
-    .dout_valid_4(),
-    .dout_data_4(),
-    .dout_enable_5(),
-    .dout_valid_5(),
-    .dout_data_5(),
-    .dout_enable_6(),
-    .dout_valid_6(),
-    .dout_data_6(),
-    .dout_enable_7(),
-    .dout_valid_7(),
-    .dout_data_7(),
+    .dout_enable_4(fifo_adc_enable_i2),
+    .dout_valid_4(fifo_adc_valid_i2),
+    .dout_data_4(fifo_adc_data_i2),
+    .dout_enable_5(fifo_adc_enable_q2),
+    .dout_valid_5(fifo_adc_valid_q2),
+    .dout_data_5(fifo_adc_data_q2),
+    .dout_enable_6(fifo_adc_enable_i3),
+    .dout_valid_6(fifo_adc_valid_i3),
+    .dout_data_6(fifo_adc_data_i3),
+    .dout_enable_7(fifo_adc_enable_q3),
+    .dout_valid_7(fifo_adc_valid_q3),
+    .dout_data_7(fifo_adc_data_q3),
     .dout_ovf(fifo_dout_ovf)
   );
 
   util_clkdiv inst_clkdiv (
     .clk(l_clk),
-    .clk_sel(adc_r1_mode & dac_r1_mode),
+    .clk_sel(adc_r1_mode_0 & dac_r1_mode_0 & adc_r1_mode_1 & dac_r1_mode_1),
     .clk_out(d_clk)
   );
 
   util_tdd_sync #(
     .TDD_SYNC_PERIOD(100000000)
-    ) isnt_util_tdd_sync (
+    ) isnt_util_tdd_sync_0 (
     .clk(axi_aclk),
     .rstn(axi_aresetn),
-    .sync_mode(tdd_sync_cntr),
-    .sync_in(tdd_sync_i),
-    .sync_out(sync_out)
+    .sync_mode(tdd_sync_cntr_0),
+    .sync_in(tdd_sync_0_i),
+    .sync_out(sync_out_0)
+  );
+
+  util_tdd_sync #(
+    .TDD_SYNC_PERIOD(100000000)
+    ) isnt_util_tdd_sync_1 (
+    .clk(axi_aclk),
+    .rstn(axi_aresetn),
+    .sync_mode(tdd_sync_cntr_1),
+    .sync_in(tdd_sync_1_i),
+    .sync_out(sync_out_1)
   );
 
   ad_rst inst_ad_reset (
@@ -1308,9 +1583,9 @@ module ad9361_pl_wrapper #(
     .C_AXI_DATA_WIDTH(32),
     .C_AXI_ADDR_WIDTH(32),
     .NM(1),
-    .NS(3),
-    .SLAVE_ADDR({{AXI_DMAC_ADC_ADDR},{AXI_DMAC_DAC_ADDR},{AXI_AD9361_ADDR}}),
-    .SLAVE_MASK({{32'hFFFFF000},{32'hFFFFF000},{32'hFFFF0000}})
+    .NS(4),
+    .SLAVE_ADDR({{AXI_DMAC_ADC_ADDR},{AXI_DMAC_DAC_ADDR},{AXI_AD9361_0_ADDR}, {AXI_AD9361_1_ADDR}}),
+    .SLAVE_MASK({{32'hFFFFF000},{32'hFFFFF000},{32'hFFFFF000}, {32'hFFFFF000}})
   ) inst_axilxbar (
     .S_AXI_ACLK(axi_aclk),
     .S_AXI_ARESETN(axi_aresetn),
@@ -1333,25 +1608,25 @@ module ad9361_pl_wrapper #(
     .S_AXI_RRESP(s_axi_rresp),
     .S_AXI_RVALID(s_axi_rvalid),
     .S_AXI_RREADY(s_axi_rready),
-    .M_AXI_AWADDR({adc_dma_axi_awaddr, dac_dma_axi_awaddr, ad9361_axi_awaddr}),
-    .M_AXI_AWPROT({adc_dma_axi_awprot, dac_dma_axi_awprot, ad9361_axi_awprot}),
-    .M_AXI_AWVALID({adc_dma_axi_awvalid, dac_dma_axi_awvalid, ad9361_axi_awvalid}),
-    .M_AXI_AWREADY({adc_dma_axi_awready, dac_dma_axi_awready, ad9361_axi_awready}),
-    .M_AXI_WDATA({adc_dma_axi_wdata, dac_dma_axi_wdata, ad9361_axi_wdata}),
-    .M_AXI_WSTRB({adc_dma_axi_wstrb, dac_dma_axi_wstrb, ad9361_axi_wstrb}),
-    .M_AXI_WVALID({adc_dma_axi_wvalid, dac_dma_axi_wvalid, ad9361_axi_wvalid}),
-    .M_AXI_WREADY({adc_dma_axi_wready, dac_dma_axi_wready, ad9361_axi_wready}),
-    .M_AXI_BRESP({adc_dma_axi_bresp, dac_dma_axi_bresp, ad9361_axi_bresp}),
-    .M_AXI_BVALID({adc_dma_axi_bvalid, dac_dma_axi_bvalid, ad9361_axi_bvalid}),
-    .M_AXI_BREADY({adc_dma_axi_bready, dac_dma_axi_bready, ad9361_axi_bready}),
-    .M_AXI_ARADDR({adc_dma_axi_araddr, dac_dma_axi_araddr, ad9361_axi_araddr}),
-    .M_AXI_ARPROT({adc_dma_axi_arprot, dac_dma_axi_arprot, ad9361_axi_arprot}),
-    .M_AXI_ARVALID({adc_dma_axi_arvalid, dac_dma_axi_arvalid, ad9361_axi_arvalid}),
-    .M_AXI_ARREADY({adc_dma_axi_arready, dac_dma_axi_arready, ad9361_axi_arready}),
-    .M_AXI_RDATA({adc_dma_axi_rdata, dac_dma_axi_rdata, ad9361_axi_rdata}),
-    .M_AXI_RRESP({adc_dma_axi_rresp, dac_dma_axi_rresp, ad9361_axi_rresp}),
-    .M_AXI_RVALID({adc_dma_axi_rvalid, dac_dma_axi_rvalid, ad9361_axi_rvalid}),
-    .M_AXI_RREADY({adc_dma_axi_rready, dac_dma_axi_rready, ad9361_axi_rready})
+    .M_AXI_AWADDR({adc_dma_axi_awaddr, dac_dma_axi_awaddr, ad9361_0_axi_awaddr, ad9361_1_axi_awaddr}),
+    .M_AXI_AWPROT({adc_dma_axi_awprot, dac_dma_axi_awprot, ad9361_0_axi_awprot, ad9361_1_axi_awprot}),
+    .M_AXI_AWVALID({adc_dma_axi_awvalid, dac_dma_axi_awvalid, ad9361_0_axi_awvalid, ad9361_1_axi_awvalid}),
+    .M_AXI_AWREADY({adc_dma_axi_awready, dac_dma_axi_awready, ad9361_0_axi_awready, ad9361_1_axi_awready}),
+    .M_AXI_WDATA({adc_dma_axi_wdata, dac_dma_axi_wdata, ad9361_0_axi_wdata, ad9361_1_axi_wdata}),
+    .M_AXI_WSTRB({adc_dma_axi_wstrb, dac_dma_axi_wstrb, ad9361_0_axi_wstrb, ad9361_1_axi_wstrb}),
+    .M_AXI_WVALID({adc_dma_axi_wvalid, dac_dma_axi_wvalid, ad9361_0_axi_wvalid, ad9361_1_axi_wvalid}),
+    .M_AXI_WREADY({adc_dma_axi_wready, dac_dma_axi_wready, ad9361_0_axi_wready, ad9361_1_axi_wready}),
+    .M_AXI_BRESP({adc_dma_axi_bresp, dac_dma_axi_bresp, ad9361_0_axi_bresp, ad9361_1_axi_bresp}),
+    .M_AXI_BVALID({adc_dma_axi_bvalid, dac_dma_axi_bvalid, ad9361_0_axi_bvalid, ad9361_1_axi_bvalid}),
+    .M_AXI_BREADY({adc_dma_axi_bready, dac_dma_axi_bready, ad9361_0_axi_bready, ad9361_1_axi_bready}),
+    .M_AXI_ARADDR({adc_dma_axi_araddr, dac_dma_axi_araddr, ad9361_0_axi_araddr, ad9361_1_axi_araddr}),
+    .M_AXI_ARPROT({adc_dma_axi_arprot, dac_dma_axi_arprot, ad9361_0_axi_arprot, ad9361_1_axi_arprot}),
+    .M_AXI_ARVALID({adc_dma_axi_arvalid, dac_dma_axi_arvalid, ad9361_0_axi_arvalid, ad9361_1_axi_arvalid}),
+    .M_AXI_ARREADY({adc_dma_axi_arready, dac_dma_axi_arready, ad9361_0_axi_arready, ad9361_1_axi_arready}),
+    .M_AXI_RDATA({adc_dma_axi_rdata, dac_dma_axi_rdata, ad9361_0_axi_rdata, ad9361_1_axi_rdata}),
+    .M_AXI_RRESP({adc_dma_axi_rresp, dac_dma_axi_rresp, ad9361_0_axi_rresp, ad9361_1_axi_rresp}),
+    .M_AXI_RVALID({adc_dma_axi_rvalid, dac_dma_axi_rvalid, ad9361_0_axi_rvalid, ad9361_1_axi_rvalid}),
+    .M_AXI_RREADY({adc_dma_axi_rready, dac_dma_axi_rready, ad9361_0_axi_rready, ad9361_1_axi_rready})
   );
 
 endmodule

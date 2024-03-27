@@ -64,31 +64,57 @@ module system_pl_wrapper #(
     output        dac_dma_irq,
 
     //AD9361 IO
+    //common
     //clocks
     input         delay_clk,
+    //ID 0
     //RX LVDS
-    input         rx_clk_in_p,
-    input         rx_clk_in_n,
-    input         rx_frame_in_p,
-    input         rx_frame_in_n,
-    input   [5:0] rx_data_in_p,
-    input   [5:0] rx_data_in_n,
+    input         rx_clk_in_0_p,
+    input         rx_clk_in_0_n,
+    input         rx_frame_in_0_p,
+    input         rx_frame_in_0_n,
+    input   [5:0] rx_data_in_0_p,
+    input   [5:0] rx_data_in_0_n,
     //TX LVDS
-    output        tx_clk_out_p,
-    output        tx_clk_out_n,
-    output        tx_frame_out_p,
-    output        tx_frame_out_n,
-    output  [5:0] tx_data_out_p,
-    output  [5:0] tx_data_out_n,
+    output        tx_clk_out_0_p,
+    output        tx_clk_out_0_n,
+    output        tx_frame_out_0_p,
+    output        tx_frame_out_0_n,
+    output  [5:0] tx_data_out_0_p,
+    output  [5:0] tx_data_out_0_n,
     //MISC
-    output        enable,
-    output        txnrx,
-    input         up_enable,
-    input         up_txnrx,
+    output        enable_0,
+    output        txnrx_0,
+    input         up_enable_0,
+    input         up_txnrx_0,
     //sync
-    output        tdd_sync_t,
-    input         tdd_sync_i,
-    output        tdd_sync_o,
+    output        tdd_sync_0_t,
+    input         tdd_sync_0_i,
+    output        tdd_sync_0_o,
+    //ID 1
+    //RX LVDS
+    input         rx_clk_in_1_p,
+    input         rx_clk_in_1_n,
+    input         rx_frame_in_1_p,
+    input         rx_frame_in_1_n,
+    input   [5:0] rx_data_in_1_p,
+    input   [5:0] rx_data_in_1_n,
+    //TX LVDS
+    output        tx_clk_out_1_p,
+    output        tx_clk_out_1_n,
+    output        tx_frame_out_1_p,
+    output        tx_frame_out_1_n,
+    output  [5:0] tx_data_out_1_p,
+    output  [5:0] tx_data_out_1_n,
+    //MISC
+    output        enable_1,
+    output        txnrx_1,
+    input         up_enable_1,
+    input         up_txnrx_1,
+    //sync
+    output        tdd_sync_1_t,
+    input         tdd_sync_1_i,
+    output        tdd_sync_1_o,
 
     //axi interface for the adc to the hp interface
     output [31:0]   adc_m_dest_axi_awaddr,
@@ -124,7 +150,7 @@ module system_pl_wrapper #(
     input           dac_m_src_axi_rlast
   );
 
-  ad9361_pl_wrapper #(
+  ad9361x2_pl_wrapper #(
     .FPGA_TECHNOLOGY(FPGA_TECHNOLOGY),
     .FPGA_FAMILY(FPGA_FAMILY),
     .SPEED_GRADE(SPEED_GRADE),
@@ -135,31 +161,32 @@ module system_pl_wrapper #(
     .DMA_AXI_PROTOCOL_TO_PS(0), //AXI4
     .AXI_DMAC_ADC_ADDR(32'h9C400000),
     .AXI_DMAC_DAC_ADDR(32'h9C420000),
-    .AXI_AD9361_ADDR(32'h99020000)
-  ) inst_ad9361_pl_wrapper (
+    .AXI_AD9361_0_ADDR(32'h99020000),
+    .AXI_AD9361_1_ADDR(32'h99040000)
+  ) inst_ad9361x2_pl_wrapper (
     //AXI4LITE SLAVE INTERFACE TO CROSSBAR
     .axi_aclk(axi_aclk),
     .axi_aresetn(axi_aresetn),
 
-    .s_axi_awvalid(s_axi_awvalid),
-    .s_axi_awaddr(s_axi_awaddr),
-    .s_axi_awready(s_axi_awready),
-    .s_axi_awprot(s_axi_awprot),
-    .s_axi_wvalid(s_axi_wvalid),
-    .s_axi_wdata(s_axi_wdata),
-    .s_axi_wstrb(s_axi_wstrb),
-    .s_axi_wready(s_axi_wready),
-    .s_axi_bvalid(s_axi_bvalid),
-    .s_axi_bresp(s_axi_bresp),
-    .s_axi_bready(s_axi_bready),
-    .s_axi_arvalid(s_axi_arvalid),
-    .s_axi_araddr(s_axi_araddr),
-    .s_axi_arready(s_axi_arready),
-    .s_axi_arprot(s_axi_arprot),
-    .s_axi_rvalid(s_axi_rvalid),
-    .s_axi_rready(s_axi_rready),
-    .s_axi_rresp(s_axi_rresp),
-    .s_axi_rdata(s_axi_rdata),
+    .s_axi_awvalid(connect_axi_awvalid),
+    .s_axi_awaddr(connect_axi_awaddr),
+    .s_axi_awready(connect_axi_awready),
+    .s_axi_awprot(connect_axi_awprot),
+    .s_axi_wvalid(connect_axi_wvalid),
+    .s_axi_wdata(connect_axi_wdata),
+    .s_axi_wstrb(connect_axi_wstrb),
+    .s_axi_wready(connect_axi_wready),
+    .s_axi_bvalid(connect_axi_bvalid),
+    .s_axi_bresp(connect_axi_bresp),
+    .s_axi_bready(connect_axi_bready),
+    .s_axi_arvalid(connect_axi_arvalid),
+    .s_axi_araddr(connect_axi_araddr),
+    .s_axi_arready(connect_axi_arready),
+    .s_axi_arprot(connect_axi_arprot),
+    .s_axi_rvalid(connect_axi_rvalid),
+    .s_axi_rready(connect_axi_rready),
+    .s_axi_rresp(connect_axi_rresp),
+    .s_axi_rdata(connect_axi_rdata),
 
     //irq
     .adc_dma_irq(adc_dma_irq),
@@ -168,29 +195,54 @@ module system_pl_wrapper #(
     //AD9361 IO
     //clocks
     .delay_clk(delay_clk),
+    //ID 0
     //RX LVDS
-    .rx_clk_in_p(rx_clk_in_p),
-    .rx_clk_in_n(rx_clk_in_n),
-    .rx_frame_in_p(rx_frame_in_p),
-    .rx_frame_in_n(rx_frame_in_n),
-    .rx_data_in_p(rx_data_in_p),
-    .rx_data_in_n(rx_data_in_n),
+    .rx_clk_in_0_p(rx_clk_in_0_p),
+    .rx_clk_in_0_n(rx_clk_in_0_n),
+    .rx_frame_in_0_p(rx_frame_in_0_p),
+    .rx_frame_in_0_n(rx_frame_in_0_n),
+    .rx_data_in_0_p(rx_data_in_0_p),
+    .rx_data_in_0_n(rx_data_in_0_n),
     //TX LVDS
-    .tx_clk_out_p(tx_clk_out_p),
-    .tx_clk_out_n(tx_clk_out_n),
-    .tx_frame_out_p(tx_frame_out_p),
-    .tx_frame_out_n(tx_frame_out_n),
-    .tx_data_out_p(tx_data_out_p),
-    .tx_data_out_n(tx_data_out_n),
+    .tx_clk_out_0_p(tx_clk_out_0_p),
+    .tx_clk_out_0_n(tx_clk_out_0_n),
+    .tx_frame_out_0_p(tx_frame_out_0_p),
+    .tx_frame_out_0_n(tx_frame_out_0_n),
+    .tx_data_out_0_p(tx_data_out_0_p),
+    .tx_data_out_0_n(tx_data_out_0_n),
     //MISC
-    .enable(enable),
-    .txnrx(txnrx),
-    .up_enable(up_enable),
-    .up_txnrx(up_txnrx),
+    .enable_0(enable_0),
+    .txnrx_0(txnrx_0),
+    .up_enable_0(up_enable_0),
+    .up_txnrx_0(up_txnrx_0),
     //sync
-    .tdd_sync_t(tdd_sync_t),
-    .tdd_sync_i(tdd_sync_i),
-    .tdd_sync_o(tdd_sync_o),
+    .tdd_sync_0_t(tdd_sync_0_t),
+    .tdd_sync_0_i(tdd_sync_0_i),
+    .tdd_sync_0_o(tdd_sync_0_o),
+    //ID 1
+    //RX LVDS
+    .rx_clk_in_1_p(rx_clk_in_1_p),
+    .rx_clk_in_1_n(rx_clk_in_1_n),
+    .rx_frame_in_1_p(rx_frame_in_1_p),
+    .rx_frame_in_1_n(rx_frame_in_1_n),
+    .rx_data_in_1_p(rx_data_in_1_p),
+    .rx_data_in_1_n(rx_data_in_1_n),
+    //TX LVDS
+    .tx_clk_out_1_p(tx_clk_out_1_p),
+    .tx_clk_out_1_n(tx_clk_out_1_n),
+    .tx_frame_out_1_p(tx_frame_out_1_p),
+    .tx_frame_out_1_n(tx_frame_out_1_n),
+    .tx_data_out_1_p(tx_data_out_1_p),
+    .tx_data_out_1_n(tx_data_out_1_n),
+    //MISC
+    .enable_1(enable_1),
+    .txnrx_1(txnrx_1),
+    .up_enable_1(up_enable_1),
+    .up_txnrx_1(up_txnrx_1),
+    //sync
+    .tdd_sync_1_t(tdd_sync_1_t),
+    .tdd_sync_1_i(tdd_sync_1_i),
+    .tdd_sync_1_o(tdd_sync_1_o),
 
     //axi interface for the adc to the hp interface
     .adc_m_dest_axi_awaddr(adc_m_dest_axi_awaddr),

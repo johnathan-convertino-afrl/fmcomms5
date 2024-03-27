@@ -63,46 +63,85 @@ module system_wrapper #(
 
     inout       [14:0]      gpio_bd,
 
-    input                   rx_clk_in_p,
-    input                   rx_clk_in_n,
-    input                   rx_frame_in_p,
-    input                   rx_frame_in_n,
-    input       [ 5:0]      rx_data_in_p,
-    input       [ 5:0]      rx_data_in_n,
-    output                  tx_clk_out_p,
-    output                  tx_clk_out_n,
-    output                  tx_frame_out_p,
-    output                  tx_frame_out_n,
-    output      [ 5:0]      tx_data_out_p,
-    output      [ 5:0]      tx_data_out_n,
+    //ID 0
+    input                   rx_clk_in_0_p,
+    input                   rx_clk_in_0_n,
+    input                   rx_frame_in_0_p,
+    input                   rx_frame_in_0_n,
+    input       [ 5:0]      rx_data_in_0_p,
+    input       [ 5:0]      rx_data_in_0_n,
+    output                  tx_clk_out_0_p,
+    output                  tx_clk_out_0_n,
+    output                  tx_frame_out_0_p,
+    output                  tx_frame_out_0_n,
+    output      [ 5:0]      tx_data_out_0_p,
+    output      [ 5:0]      tx_data_out_0_n,
+    inout       [ 7:0]      gpio_status_0,
+    inout       [ 3:0]      gpio_ctl_0,
+    inout                   gpio_en_agc_0,
+    inout                   gpio_resetb_0,
+    inout                   gpio_debug_1_0,
+    inout                   gpio_debug_2_0,
+    inout                   gpio_calsw_1_0,
+    inout                   gpio_calsw_2_0,
+    inout                   gpio_ad5355_rfen,
+    inout                   gpio_ad5355_lock,
+    output                  enable_0,
+    output                  txnrx_0,
 
-    output                  txnrx,
-    output                  enable,
+    //ID 1
+    input                   rx_clk_in_1_p,
+    input                   rx_clk_in_1_n,
+    input                   rx_frame_in_1_p,
+    input                   rx_frame_in_1_n,
+    input       [ 5:0]      rx_data_in_1_p,
+    input       [ 5:0]      rx_data_in_1_n,
+    output                  tx_clk_out_1_p,
+    output                  tx_clk_out_1_n,
+    output                  tx_frame_out_1_p,
+    output                  tx_frame_out_1_n,
+    output      [ 5:0]      tx_data_out_1_p,
+    output      [ 5:0]      tx_data_out_1_n,
+    inout       [ 7:0]      gpio_status_1,
+    inout       [ 3:0]      gpio_ctl_1,
+    inout                   gpio_en_agc_1,
+    inout                   gpio_resetb_1,
+    inout                   gpio_debug_3_1,
+    inout                   gpio_debug_4_1,
+    inout                   gpio_calsw_3_1,
+    inout                   gpio_calsw_4_1,
+    inout                   gpio_debug_3_1,
+    inout                   gpio_debug_4_1,
+    inout                   gpio_calsw_3_1,
+    inout                   gpio_calsw_4_1,
+    output                  txnrx_1,
+    output                  enable_1,
 
-    inout                   gpio_muxout_tx,
-    inout                   gpio_muxout_rx,
-    inout                   gpio_resetb,
-    inout                   gpio_sync,
-    inout                   gpio_en_agc,
-    inout       [ 3:0]      gpio_ctl,
-    inout       [ 7:0]      gpio_status,
+    output                  mcs_sync,
 
-    output                  spi_csn,
+    output                  spi_ad9361_0,
+    output                  spi_ad9361_1,
+    output                  spi_ad5355,
     output                  spi_clk,
     output                  spi_mosi,
     input                   spi_miso,
 
-    output                  spi_udc_csn_tx,
-    output                  spi_udc_csn_rx,
-    output                  spi_udc_sclk,
-    output                  spi_udc_data
+    input                   ref_clk_p,
+    input                   ref_clk_n
   );
 
   // internal signals
+  wire            ref_clk_s;
+  wire            ref_clk;
 
   wire    [63:0]  gpio_i;
   wire    [63:0]  gpio_o;
   wire    [63:0]  gpio_t;
+
+  wire            gpio_enable_0;
+  wire            gpio_txnrx_0;
+  wire            gpio_enable_1;
+  wire            gpio_txnrx_1;
 
   //PS TO PL / PL TO PS signals
 
@@ -167,29 +206,75 @@ module system_wrapper #(
   wire [ 1:0]   dac_hp1_axi_rresp;
   wire          dac_hp1_axi_rlast;
 
+  //reg
+  reg  [ 2:0]   mcs_sync_m = 'd0;
+  reg           r_mcs_sync = 1'b0;
+
   // instantiations... copy pasta
 
-  ad_iobuf #(.DATA_WIDTH(17)) i_iobuf (
-    .dio_t ({gpio_t[50:49], gpio_t[46:32]}),
-    .dio_i ({gpio_o[50:49], gpio_o[46:32]}),
-    .dio_o ({gpio_i[50:49], gpio_i[46:32]}),
-    .dio_p ({ gpio_muxout_tx,     // 50:50
-              gpio_muxout_rx,     // 49:49
-              gpio_resetb,        // 46:46
-              gpio_sync,          // 45:45
-              gpio_en_agc,        // 44:44
-              gpio_ctl,           // 43:40
-              gpio_status}));     // 39:32
+  // multi-chip synchronization
 
-  ad_iobuf #(.DATA_WIDTH(15)) i_iobuf_bd (
-    .dio_t (gpio_t[14:0]),
-    .dio_i (gpio_o[14:0]),
-    .dio_o (gpio_i[14:0]),
-    .dio_p (gpio_bd));
+  always @(posedge ref_clk or negedge s_axi_aresetn) begin
+    if (s_axi_aresetn == 1'b0) begin
+      mcs_sync_m <= 3'd0;
+      r_mcs_sync <= 1'd0;
+    end else begin
+      mcs_sync_m <= {mcs_sync_m[1:0], gpio_o[45]};
+      r_mcs_sync <= mcs_sync_m[2] & ~mcs_sync_m[1];
+    end
+  end
 
-  assign gpio_i[63:51] = gpio_o[63:51];
-  assign gpio_i[48:47] = gpio_o[48:47];
-  assign gpio_i[31:15] = gpio_o[31:15];
+  IBUFGDS i_ref_clk_ibuf (
+    .I (ref_clk_p),
+    .IB (ref_clk_n),
+    .O (ref_clk_s));
+
+  BUFR #(
+    .BUFR_DIVIDE ("BYPASS")
+  ) i_ref_clk_rbuf (
+    .CLR (1'b0),
+    .CE (1'b1),
+    .I (ref_clk_s),
+    .O (ref_clk));
+
+
+  ad_iobuf #(
+    .DATA_WIDTH(57)
+  ) i_iobuf (
+    .dio_t ({gpio_t[59:46], gpio_t[43:16], gpio_t[14:0]}),
+    .dio_i ({gpio_o[59:46], gpio_o[43:16], gpio_o[14:0]}),
+    .dio_o ({gpio_i[59:46], gpio_i[43:16], gpio_i[14:0]}),
+    .dio_p ({ gpio_resetb_1,    // 59
+              gpio_ad5355_lock, // 58
+              gpio_ad5355_rfen, // 57
+              gpio_calsw_4_1,   // 56
+              gpio_calsw_3_1,   // 55
+              gpio_calsw_2_0,   // 54
+              gpio_calsw_1_0,   // 53
+              gpio_txnrx_1,     // 52
+              gpio_enable_1,    // 51
+              gpio_en_agc_1,    // 50
+              gpio_txnrx_0,     // 49
+              gpio_enable_0,    // 48
+              gpio_en_agc_0,    // 47
+              gpio_resetb_0,    // 46
+              gpio_debug_4_1,   // 43
+              gpio_debug_3_1,   // 42
+              gpio_debug_2_0,   // 41
+              gpio_debug_1_0,   // 40
+              gpio_ctl_1,       // 39:36
+              gpio_ctl_0,       // 35:32
+              gpio_status_1,    // 31:24
+              gpio_status_0,    // 23:16
+              gpio_bd}));       // 14: 0
+
+  assign gpio_i[63:60] = gpio_o[63:60];
+  assign gpio_i[45:44] = gpio_o[45:44];
+  assign gpio_i[15] = gpio_o[15];
+
+  assign mcs_sync = r_mcs_sync;
+
+  // back to my wrappers
 
   system_pl_wrapper #(
     .FPGA_TECHNOLOGY(FPGA_TECHNOLOGY),
@@ -231,29 +316,54 @@ module system_wrapper #(
     //AD9361 IO
     //clocks
     .delay_clk(s_delay_clk),
+    //ID 0
     //RX LVDS
-    .rx_clk_in_p(rx_clk_in_p),
-    .rx_clk_in_n(rx_clk_in_n),
-    .rx_frame_in_p(rx_frame_in_p),
-    .rx_frame_in_n(rx_frame_in_n),
-    .rx_data_in_p(rx_data_in_p),
-    .rx_data_in_n(rx_data_in_n),
+    .rx_clk_in_0_p(rx_clk_in_0_p),
+    .rx_clk_in_0_n(rx_clk_in_0_n),
+    .rx_frame_in_0_p(rx_frame_in_0_p),
+    .rx_frame_in_0_n(rx_frame_in_0_n),
+    .rx_data_in_0_p(rx_data_in_0_p),
+    .rx_data_in_0_n(rx_data_in_0_n),
     //TX LVDS
-    .tx_clk_out_p(tx_clk_out_p),
-    .tx_clk_out_n(tx_clk_out_n),
-    .tx_frame_out_p(tx_frame_out_p),
-    .tx_frame_out_n(tx_frame_out_n),
-    .tx_data_out_p(tx_data_out_p),
-    .tx_data_out_n(tx_data_out_n),
+    .tx_clk_out_0_p(tx_clk_out_0_p),
+    .tx_clk_out_0_n(tx_clk_out_0_n),
+    .tx_frame_out_0_p(tx_frame_out_0_p),
+    .tx_frame_out_0_n(tx_frame_out_0_n),
+    .tx_data_out_0_p(tx_data_out_0_p),
+    .tx_data_out_0_n(tx_data_out_0_n),
     //MISC
-    .enable(enable),
-    .txnrx(txnrx),
-    .up_enable(gpio_o[47]),
-    .up_txnrx(gpio_o[48]),
+    .enable_0(enable_0),
+    .txnrx_0(txnrx_0),
+    .up_enable_0(gpio_enable_0),
+    .up_txnrx_0(gpio_txnrx_0),
     //sync
-    .tdd_sync_t(),
-    .tdd_sync_i(1'b0),
-    .tdd_sync_o(),
+    .tdd_sync_0_t(),
+    .tdd_sync_0_i(1'b0),
+    .tdd_sync_0_o(),
+    //ID 1
+    //RX LVDS
+    .rx_clk_in_1_p(rx_clk_in_1_p),
+    .rx_clk_in_1_n(rx_clk_in_1_n),
+    .rx_frame_in_1_p(rx_frame_in_1_p),
+    .rx_frame_in_1_n(rx_frame_in_1_n),
+    .rx_data_in_1_p(rx_data_in_1_p),
+    .rx_data_in_1_n(rx_data_in_1_n),
+    //TX LVDS
+    .tx_clk_out_1_p(tx_clk_out_1_p),
+    .tx_clk_out_1_n(tx_clk_out_1_n),
+    .tx_frame_out_1_p(tx_frame_out_1_p),
+    .tx_frame_out_1_n(tx_frame_out_1_n),
+    .tx_data_out_1_p(tx_data_out_1_p),
+    .tx_data_out_1_n(tx_data_out_1_n),
+    //MISC
+    .enable_1(enable_1),
+    .txnrx_1(txnrx_1),
+    .up_enable_1(gpio_enable_1),
+    .up_txnrx_1(gpio_txnrx_1),
+    //sync
+    .tdd_sync_1_t(),
+    .tdd_sync_1_i(1'b0),
+    .tdd_sync_1_o(),
 
     //axi interface for the adc to the hp interface
     .adc_m_dest_axi_awaddr(adc_hp0_axi_awaddr),
@@ -298,22 +408,27 @@ module system_wrapper #(
       .GPIO_I(gpio_i),
       .GPIO_O(gpio_o),
       .GPIO_T(gpio_t),
-      .SPI0_SCLK_I(1'b0),
+
+      .SPI0_SCLK_I(1'b0), //spi_clk connected in AD
       .SPI0_SCLK_O(spi_clk),
-      .SPI0_MOSI_I(1'b0),
+      .SPI0_MOSI_I(1'b0), //spi_mosi connected in AD
       .SPI0_MOSI_O(spi_mosi),
       .SPI0_MISO_I(spi_miso),
       .SPI0_SS_I(1'b1),
-      .SPI0_SS_O(spi_csn),
+      .SPI0_SS_O(spi_ad9361_0),
+      .SPI0_SS1_O(spi_ad9361_1),
+      .SPI0_SS2_O(spi_ad5355),
+
       .SPI1_SCLK_I(1'b0),
-      .SPI1_SCLK_O(spi_udc_sclk),
-      .SPI1_MOSI_I(spi_udc_data),
-      .SPI1_MOSI_O(spi_udc_data),
+      .SPI1_SCLK_O(),
+      .SPI1_MOSI_I(1'b0),
+      .SPI1_MOSI_O(),
       .SPI1_MISO_I(1'b0),
       .SPI1_SS_I(1'b1),
-      .SPI1_SS_O(spi_udc_csn_tx),
-      .SPI1_SS1_O(spi_udc_csn_rx),
+      .SPI1_SS_O(),
+      .SPI1_SS1_O(),
       .SPI1_SS2_O(),
+
       .M_AXI_araddr(w_axi_araddr),
       .M_AXI_arprot(w_axi_arprot),
       .M_AXI_arready(w_axi_arready),
