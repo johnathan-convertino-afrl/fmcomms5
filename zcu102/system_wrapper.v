@@ -169,6 +169,7 @@ module system_wrapper #(
 
   // internal registers
 
+  reg             r_mcs_sync;
   reg     [  2:0] mcs_sync_m = 'd0;
 
   // internal signals
@@ -185,10 +186,10 @@ module system_wrapper #(
   always @(posedge ref_clk or negedge s_axi_aresetn) begin
     if (s_axi_aresetn == 1'b0) begin
       mcs_sync_m <= 3'd0;
-      mcs_sync <= 1'd0;
+      r_mcs_sync <= 1'd0;
     end else begin
       mcs_sync_m <= {mcs_sync_m[1:0], gpio_sync};
-      mcs_sync <= mcs_sync_m[2] & ~mcs_sync_m[1];
+      r_mcs_sync <= mcs_sync_m[2] & ~mcs_sync_m[1];
     end
   end
 
@@ -210,6 +211,8 @@ module system_wrapper #(
     .CE (1'b1),
     .I (ref_clk_s),
     .O (ref_clk));
+
+  assign mcs_sync = r_mcs_sync;
 
   assign gpio_resetb_1 = gpio_o[65];
   assign gpio_ad5355_rfen = gpio_o[63];

@@ -106,31 +106,64 @@ module system_wrapper #(
     output  [  3:0]   gpio_bd_o,
 
     // ad9361-interface
+    input       [12:0]      gpio_bd_i,
+    output      [ 7:0]      gpio_bd_o,
 
-    input             rx_clk_in,
-    input             rx_frame_in_p,
-    input             rx_frame_in_n,
-    input   [ 5:0]    rx_data_in_p,
-    input   [ 5:0]    rx_data_in_n,
-    output            tx_clk_out_p,
-    output            tx_clk_out_n,
-    output            tx_frame_out_p,
-    output            tx_frame_out_n,
-    output  [ 5:0]    tx_data_out_p,
-    output  [ 5:0]    tx_data_out_n,
-    output            enable,
-    output            txnrx,
+    input                   rx_clk_in_0,
+    input                   rx_frame_in_0_p,
+    input                   rx_frame_in_0_n,
+    input       [ 5:0]      rx_data_in_0_p,
+    input       [ 5:0]      rx_data_in_0_n,
+    output                  tx_clk_out_0_p,
+    output                  tx_clk_out_0_n,
+    output                  tx_frame_out_0_p,
+    output                  tx_frame_out_0_n,
+    output      [ 5:0]      tx_data_out_0_p,
+    output      [ 5:0]      tx_data_out_0_n,
+    input       [ 7:0]      gpio_status_0,
+    output      [ 3:0]      gpio_ctl_0,
+    output                  gpio_en_agc_0,
+    output                  mcs_sync,
+    output                  gpio_resetb_0,
+    output                  enable_0,
+    output                  txnrx_0,
+    output                  gpio_debug_1_0,
+    output                  gpio_debug_2_0,
+    output                  gpio_calsw_1_0,
+    output                  gpio_calsw_2_0,
+    output                  gpio_ad5355_rfen,
+    input                   gpio_ad5355_lock,
 
-    output            gpio_resetb,
-    output            gpio_sync,
-    output            gpio_en_agc,
-    output  [  3:0]   gpio_ctl,
-    input   [  7:0]   gpio_status,
+    input                   rx_clk_in_1,
+    input                   rx_frame_in_1_p,
+    input                   rx_frame_in_1_n,
+    input       [ 5:0]      rx_data_in_1_p,
+    input       [ 5:0]      rx_data_in_1_n,
+    output                  tx_clk_out_1_p,
+    output                  tx_clk_out_1_n,
+    output                  tx_frame_out_1_p,
+    output                  tx_frame_out_1_n,
+    output      [ 5:0]      tx_data_out_1_p,
+    output      [ 5:0]      tx_data_out_1_n,
+    input       [ 7:0]      gpio_status_1,
+    output      [ 3:0]      gpio_ctl_1,
+    output                  gpio_en_agc_1,
+    output                  gpio_resetb_1,
+    output                  enable_1,
+    output                  txnrx_1,
+    output                  gpio_debug_3_1,
+    output                  gpio_debug_4_1,
+    output                  gpio_calsw_3_1,
+    output                  gpio_calsw_4_1,
 
-    output            spi_csn,
-    output            spi_clk,
-    output            spi_mosi,
-    input             spi_miso
+    output                  spi_ad9361_0,
+    output                  spi_ad9361_1,
+    output                  spi_ad5355,
+    output                  spi_clk,
+    output                  spi_mosi,
+    input                   spi_miso,
+
+    input                   ref_clk
   );
 
   // internal signals
@@ -202,6 +235,36 @@ module system_wrapper #(
   wire              sys_resetn_s;
   wire    [ 63:0]   gpio_i;
   wire    [ 63:0]   gpio_o;
+  wire    [  4:0]   spi_ssn_spacer;
+
+  reg     [  2:0] mcs_sync_m = 'd0;
+
+  // internal signals
+
+  wire            s_ref_clk;
+  reg             r_mcs_sync;
+
+  // multi-chip synchronization
+
+  always @(posedge s_ref_clk or negedge s_axi_aresetn) begin
+    if (s_axi_aresetn == 1'b0) begin
+      mcs_sync_m <= 3'd0;
+      r_mcs_sync <= 1'd0;
+    end else begin
+      mcs_sync_m <= {mcs_sync_m[1:0], gpio_sync};
+      r_mcs_sync <= mcs_sync_m[2] & ~mcs_sync_m[1];
+    end
+  end
+
+  twentynm_clkena #(
+    .clock_type("Global Clock"),
+    .en_register_mode("always enabled"),
+    .lpm_type("twentynm_clkena"))
+  clk_buf (
+    .ena(1'b1),
+    .enaout(),
+    .inclk(ref_clk),
+    .outclk(s_ref_clk));
 
   // assignments
 
@@ -220,6 +283,8 @@ module system_wrapper #(
   assign gpio_i[ 3: 0] = gpio_o[ 3: 0];
 
   assign gpio_bd_o = gpio_o[3:0];
+
+  assign mcs_sync = r_mcs_sync;
 
   // peripheral reset
 
@@ -265,29 +330,54 @@ module system_wrapper #(
     //AD9361 IO
     //clocks
     .delay_clk(s_delay_clk),
+    //ID 0
     //RX LVDS
-    .rx_clk_in_p(rx_clk_in_p),
-    .rx_clk_in_n(rx_clk_in_n),
-    .rx_frame_in_p(rx_frame_in_p),
-    .rx_frame_in_n(rx_frame_in_n),
-    .rx_data_in_p(rx_data_in_p),
-    .rx_data_in_n(rx_data_in_n),
+    .rx_clk_in_0_p(rx_clk_in_0),
+    .rx_clk_in_0_n(1'b0),
+    .rx_frame_in_0_p(rx_frame_in_0_p),
+    .rx_frame_in_0_n(rx_frame_in_0_n),
+    .rx_data_in_0_p(rx_data_in_0_p),
+    .rx_data_in_0_n(rx_data_in_0_n),
     //TX LVDS
-    .tx_clk_out_p(tx_clk_out_p),
-    .tx_clk_out_n(tx_clk_out_n),
-    .tx_frame_out_p(tx_frame_out_p),
-    .tx_frame_out_n(tx_frame_out_n),
-    .tx_data_out_p(tx_data_out_p),
-    .tx_data_out_n(tx_data_out_n),
+    .tx_clk_out_0_p(tx_clk_out_0_p),
+    .tx_clk_out_0_n(tx_clk_out_0_n),
+    .tx_frame_out_0_p(tx_frame_out_0_p),
+    .tx_frame_out_0_n(tx_frame_out_0_n),
+    .tx_data_out_0_p(tx_data_out_0_p),
+    .tx_data_out_0_n(tx_data_out_0_n),
     //MISC
-    .enable(enable),
-    .txnrx(txnrx),
-    .up_enable(gpio_o[47]),
-    .up_txnrx(gpio_o[48]),
+    .enable_0(enable_0),
+    .txnrx_0(txnrx_0),
+    .up_enable_0(gpio_enable_0),
+    .up_txnrx_0(gpio_txnrx_0),
     //sync
-    .tdd_sync_t(),
-    .tdd_sync_i(1'b0),
-    .tdd_sync_o(),
+    .tdd_sync_0_t(),
+    .tdd_sync_0_i(1'b0),
+    .tdd_sync_0_o(),
+    //ID 1
+    //RX LVDS
+    .rx_clk_in_1_p(rx_clk_in_1),
+    .rx_clk_in_1_n(1'b0),
+    .rx_frame_in_1_p(rx_frame_in_1_p),
+    .rx_frame_in_1_n(rx_frame_in_1_n),
+    .rx_data_in_1_p(rx_data_in_1_p),
+    .rx_data_in_1_n(rx_data_in_1_n),
+    //TX LVDS
+    .tx_clk_out_1_p(tx_clk_out_1_p),
+    .tx_clk_out_1_n(tx_clk_out_1_n),
+    .tx_frame_out_1_p(tx_frame_out_1_p),
+    .tx_frame_out_1_n(tx_frame_out_1_n),
+    .tx_data_out_1_p(tx_data_out_1_p),
+    .tx_data_out_1_n(tx_data_out_1_n),
+    //MISC
+    .enable_1(enable_1),
+    .txnrx_1(txnrx_1),
+    .up_enable_1(gpio_enable_1),
+    .up_txnrx_1(gpio_txnrx_1),
+    //sync
+    .tdd_sync_1_t(),
+    .tdd_sync_1_i(1'b0),
+    .tdd_sync_1_o(),
 
     //axi interface for the adc to the hp interface
     .adc_m_dest_axi_awaddr(adc_hp0_axi_awaddr),
@@ -468,8 +558,6 @@ module system_wrapper #(
     .sys_spi_MISO(spi_miso),
     .sys_spi_MOSI(spi_mosi),
     .sys_spi_SCLK(spi_clk),
-    .sys_spi_SS_n(spi_csn)
+    .sys_spi_SS_n({spi_ssn_spacer, spi_ad5355, spi_ad9361_1, spi_ad9361_0})
   );
-
-
 endmodule
