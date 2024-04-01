@@ -150,7 +150,7 @@ module system_pl_wrapper #(
     input           dac_m_src_axi_rlast
   );
 
-  ad9361_pl_wrapper #(
+  ad9361x2_pl_wrapper #(
     .FPGA_TECHNOLOGY(FPGA_TECHNOLOGY),
     .FPGA_FAMILY(FPGA_FAMILY),
     .SPEED_GRADE(SPEED_GRADE),
@@ -158,7 +158,7 @@ module system_pl_wrapper #(
     .ADC_INIT_DELAY(ADC_INIT_DELAY),
     .DAC_INIT_DELAY(DAC_INIT_DELAY),
     .DELAY_REFCLK_FREQUENCY(DELAY_REFCLK_FREQUENCY)
-  ) inst_ad9361_pl_wrapper (
+  ) inst_ad9361x2_pl_wrapper (
     //AXI4LITE SLAVE INTERFACE TO CROSSBAR
     .axi_aclk(axi_aclk),
     .axi_aresetn(axi_aresetn),
