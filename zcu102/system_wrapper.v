@@ -53,7 +53,7 @@ module system_wrapper #(
     input       [ 7:0]      gpio_status_0,
     output      [ 3:0]      gpio_ctl_0,
     output                  gpio_en_agc_0,
-    output  reg             mcs_sync,
+    output                  mcs_sync,
     output                  gpio_resetb_0,
     output                  enable_0,
     output                  txnrx_0,

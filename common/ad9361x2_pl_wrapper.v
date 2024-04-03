@@ -307,10 +307,10 @@ module ad9361x2_pl_wrapper #(
   wire           fifo_wr_en;
 
   //ADC PACK signals to ADC DMA
-  wire           packed_fifo_wr_en;
-  wire [127:0]   packed_fifo_wr_data;
-  wire           packed_fifo_wr_sync;
-  wire           packed_fifo_wr_overflow;
+  wire           fifo_m_axis_tvalid;
+  wire [127:0]   fifo_m_axis_tdata;
+  wire           fifo_m_axis_tready;
+  wire           fifo_m_axis_tuser;
 
   //DAC FIFO signals to AD9361 ID 0
   wire           dac_enable_i0;
@@ -721,7 +721,7 @@ module ad9361x2_pl_wrapper #(
     .DMA_AXI_PROTOCOL_DEST(DMA_AXI_PROTOCOL_TO_PS), //1 = AXI3, 0 = AXI4
     .DMA_AXI_PROTOCOL_SRC(1),
     .DMA_TYPE_DEST(0),
-    .DMA_TYPE_SRC(2),
+    .DMA_TYPE_SRC(1),
     .DMA_AXI_ADDR_WIDTH(32),
     .MAX_BYTES_PER_BURST(128),
     .FIFO_SIZE(8), // In bursts
@@ -857,13 +857,13 @@ module ad9361x2_pl_wrapper #(
     .m_src_axi_bid(1'b0),
 
     // Slave streaming AXI interface
-    .s_axis_aclk(1'b0),
-    .s_axis_ready(),
-    .s_axis_valid(1'b0),
-    .s_axis_data(0),
+    .s_axis_aclk(d_clk),
+    .s_axis_ready(fifo_m_axis_tready),
+    .s_axis_valid(fifo_m_axis_tvalid),
+    .s_axis_data(fifo_m_axis_tdata),
     .s_axis_strb(0),
-    .s_axis_keep(0),
-    .s_axis_user(1'b1),
+    .s_axis_keep(~0),
+    .s_axis_user(fifo_m_axis_tuser),
     .s_axis_id(0),
     .s_axis_dest(0),
     .s_axis_last(1'b0),
@@ -883,11 +883,11 @@ module ad9361x2_pl_wrapper #(
     .m_axis_xfer_req(),
 
     // Input FIFO interface
-    .fifo_wr_clk(d_clk),
-    .fifo_wr_en(packed_fifo_wr_en),
-    .fifo_wr_din(packed_fifo_wr_data),
-    .fifo_wr_overflow(packed_fifo_wr_overflow),
-    .fifo_wr_sync(packed_fifo_wr_sync),
+    .fifo_wr_clk(1'b0),
+    .fifo_wr_en(1'b0),
+    .fifo_wr_din(0),
+    .fifo_wr_overflow(),
+    .fifo_wr_sync(1'b0),
     .fifo_wr_xfer_req(),
 
     // Input FIFO interface
@@ -1098,7 +1098,7 @@ module ad9361x2_pl_wrapper #(
     .dest_diag_level_bursts()
   );
 
-  util_cpack2 #(
+  util_cpack2_axis #(
     .NUM_OF_CHANNELS(8),
     .SAMPLES_PER_CHANNEL(1),
     .SAMPLE_DATA_WIDTH(16)
@@ -1240,10 +1240,10 @@ module ad9361x2_pl_wrapper #(
     .fifo_wr_data_62(0),
     .fifo_wr_data_63(0),
 
-    .packed_fifo_wr_en(packed_fifo_wr_en),
-    .packed_fifo_wr_overflow(packed_fifo_wr_overflow),
-    .packed_fifo_wr_sync(packed_fifo_wr_sync),
-    .packed_fifo_wr_data(packed_fifo_wr_data)
+    .m_axis_tdata(fifo_m_axis_tdata),
+    .m_axis_tvalid(fifo_m_axis_tvalid),
+    .m_axis_tready(fifo_m_axis_tready),
+    .m_axis_tuser(fifo_m_axis_tuser)
   );
 
   util_upack2 #(

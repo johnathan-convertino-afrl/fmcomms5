@@ -74,7 +74,7 @@ filesets:
       - AD:RF_Transceiver:axi_ad9361:1.0.0
       - AD:utility:tdd_sync:1.0.0
       - AD:memory_controller:axi_dmac:1.0.0
-      - AD:data_flow:util_cpack:2.0.0
+      - AD:data_flow:util_cpack_axis:1.0.0
       - AD:data_flow:util_upack:2.0.0
       - AD:buffer:util_rfifo:1.0.0
       - AD:buffer:util_wfifo:1.0.0
