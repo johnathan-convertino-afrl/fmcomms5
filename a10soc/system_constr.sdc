@@ -6,6 +6,10 @@ create_clock -period "100.000 ns" -name spi_clk_virtual_10mhz
 create_clock -period "4.000 ns"   -name rx_clk_virtual_250mhz
 create_clock -period "4.000 ns"   -name tx_clk_virtual_250mhz
 
+create_generated_clock -name l_clk_d4 -source [get_nets {inst_system_pl_wrapper|inst_ad9361x2_pl_wrapper|inst_axi_ad9361_0|i_dev_if|i_clk|clk}] -divide_by 4 [get_nets {inst_system_pl_wrapper|inst_ad9361x2_pl_wrapper|inst_clkdiv|dd}]
+
+create_generated_clock -name l_clk_d2 -source [get_nets {inst_system_pl_wrapper|inst_ad9361x2_pl_wrapper|inst_axi_ad9361_0|i_dev_if|i_clk|clk}] -divide_by 2 [get_nets {inst_system_pl_wrapper|inst_ad9361x2_pl_wrapper|inst_clkdiv|d}]
+
 derive_pll_clocks
 derive_clock_uncertainty
 
