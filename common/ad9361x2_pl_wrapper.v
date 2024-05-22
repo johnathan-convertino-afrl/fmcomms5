@@ -587,7 +587,7 @@ module ad9361x2_pl_wrapper #(
     .IO_DELAY_GROUP("dev_1_if_delay_group"),
     // .IODELAY_CTRL(1),
     .MIMO_ENABLE(0),
-    .USE_SSI_CLK(1),
+    .USE_SSI_CLK(0),
     .DELAY_REFCLK_FREQUENCY(DELAY_REFCLK_FREQUENCY),
     .RX_NODPA(0)
   ) inst_axi_ad9361_1 (
