@@ -1011,7 +1011,7 @@ module ad9361x2_pl_wrapper #(
     .m_src_axi_aresetn(axi_aresetn),
 
     // Read address
-    .m_src_axi_arready(dac_m_src_axi_araddr),
+    .m_src_axi_arready(dac_m_src_axi_arready),
     .m_src_axi_arvalid(dac_m_src_axi_arvalid),
     .m_src_axi_araddr(dac_m_src_axi_araddr),
     .m_src_axi_arlen(dac_m_src_axi_arlen),
@@ -1435,7 +1435,7 @@ module ad9361x2_pl_wrapper #(
     .din_data_6(fifo_dac_data_i3),
     .din_enable_7(fifo_din_enable_q3),
     .din_valid_7(fifo_dac_valid_q3),
-    .din_valid_in_7(fifo_r_valid),
+    .din_valid_in_7(fifo_rd_valid),
     .din_data_7(fifo_dac_data_q3),
     .din_unf(fifo_din_unf),
 
