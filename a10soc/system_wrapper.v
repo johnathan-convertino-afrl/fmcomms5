@@ -515,7 +515,7 @@ module system_wrapper #(
     .sys_hps_io_hps_io_gpio_gpio1_io17 (hps_gpio[3]),
 
     .sys_hps_out_rstn_reset_n (sys_hps_resetn),
-    .sys_hps_fpga_irq1_irq ({{30{1'b0}}, s_adc_dma_irq, s_dac_dma_irq}),
+    .sys_hps_fpga_irq1_irq ({32{1'b0}}),
 
     .sys_hps_dma_data_awid(0),
     .sys_hps_dma_data_awaddr(adc_hp0_axi_awaddr),
@@ -579,6 +579,7 @@ module system_wrapper #(
     .sys_spi_MISO(spi_miso),
     .sys_spi_MOSI(spi_mosi),
     .sys_spi_SCLK(spi_clk),
-    .sys_spi_SS_n({spi_ssn_spacer, spi_ad5355, spi_ad9361_1, spi_ad9361_0})
+    .sys_spi_SS_n({spi_ssn_spacer, spi_ad5355, spi_ad9361_1, spi_ad9361_0}),
+    .irq_irq({s_dac_dma_irq, s_adc_dma_irq, {2{1'b0}}})
   );
 endmodule
