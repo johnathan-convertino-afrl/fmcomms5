@@ -205,6 +205,8 @@ module system_pl_wrapper #(
   wire scl_o;
   wire scl_t;
 
+  wire        m_axi_aresetn;
+
   ad_iobuf #(
     .DATA_WIDTH(1)
   ) iic_sda_iobuf (
@@ -221,6 +223,19 @@ module system_pl_wrapper #(
     .dio_i (scl_o),
     .dio_o (scl_i),
     .dio_p (iic_scl_fmc)
+  );
+
+  dma_rstgen inst_dma_rstgen (
+    .slowest_sync_clk(delay_clk),
+    .ext_reset_in(axi_aresetn),
+    .aux_reset_in(1'b1),
+    .mb_debug_sys_rst(1'b0),
+    .dcm_locked(1'b1),
+    .mb_reset(),
+    .bus_struct_reset(),
+    .peripheral_reset(),
+    .interconnect_aresetn(),
+    .peripheral_aresetn(m_axi_aresetn)
   );
 
   ad9361x2_pl_wrapper #(
@@ -311,6 +326,9 @@ module system_pl_wrapper #(
     .tdd_sync_1_t(tdd_sync_1_t),
     .tdd_sync_1_i(tdd_sync_1_i),
     .tdd_sync_1_o(tdd_sync_1_o),
+
+    .m_axi_aclk(delay_clk),
+    .m_axi_aresetn(m_axi_aresetn),
 
     //axi interface for the adc to the hp interface
     .adc_m_dest_axi_awaddr(adc_m_dest_axi_awaddr),

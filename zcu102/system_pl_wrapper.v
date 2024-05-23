@@ -116,6 +116,8 @@ module system_pl_wrapper #(
     input         tdd_sync_1_i,
     output        tdd_sync_1_o,
 
+    input         m_axi_aclk,
+
     //axi interface for the adc to the hp interface
     output [31:0]   adc_m_dest_axi_awaddr,
     output [ 3:0]   adc_m_dest_axi_awlen,
@@ -148,6 +150,21 @@ module system_pl_wrapper #(
     input           dac_m_src_axi_rvalid,
     input  [ 1:0]   dac_m_src_axi_rresp,
     input           dac_m_src_axi_rlast
+  );
+
+  wire        m_axi_aresetn;
+
+  dma_rstgen inst_dma_rstgen (
+    .slowest_sync_clk(m_axi_aclk),
+    .ext_reset_in(axi_aresetn),
+    .aux_reset_in(1'b1),
+    .mb_debug_sys_rst(1'b0),
+    .dcm_locked(1'b1),
+    .mb_reset(),
+    .bus_struct_reset(),
+    .peripheral_reset(),
+    .interconnect_aresetn(),
+    .peripheral_aresetn(m_axi_aresetn)
   );
 
   ad9361x2_pl_wrapper #(
@@ -243,6 +260,9 @@ module system_pl_wrapper #(
     .tdd_sync_1_t(tdd_sync_1_t),
     .tdd_sync_1_i(tdd_sync_1_i),
     .tdd_sync_1_o(tdd_sync_1_o),
+
+    .m_axi_aclk(m_axi_aclk),
+    .m_axi_aresetn(m_axi_aresetn),
 
     //axi interface for the adc to the hp interface
     .adc_m_dest_axi_awaddr(adc_m_dest_axi_awaddr),

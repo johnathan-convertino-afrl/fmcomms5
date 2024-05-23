@@ -99,7 +99,8 @@ module system_wrapper #(
   );
 
   // internal signals
-  wire    [ 2:0]  spi0_csn;
+  wire        m_axi_aclk;
+  wire        m_axi_aresetn;
 
   //PS TO PL / PL TO PS signals
 
@@ -335,6 +336,8 @@ module system_wrapper #(
     .tdd_sync_1_i(1'b0),
     .tdd_sync_1_o(),
 
+    .m_axi_aclk(m_axi_aclk),
+
     //axi interface for the adc to the hp interface
     .adc_m_dest_axi_awaddr(adc_hp0_axi_awaddr),
     .adc_m_dest_axi_awlen(adc_hp0_axi_awlen),
@@ -401,7 +404,7 @@ module system_wrapper #(
     .S_AXI_HP0_bid(),
     .S_AXI_HP0_rid(),
     .S_AXI_HP0_rdata(),
-    .S_AXI_HP0_ACLK(s_axi_clk),
+    .S_AXI_HP0_ACLK(m_axi_aclk),
     .S_AXI_HP0_arvalid(1'b0),
     .S_AXI_HP0_awvalid(adc_hp0_axi_awvalid),
     .S_AXI_HP0_bready(adc_hp0_axi_bready),
@@ -442,7 +445,7 @@ module system_wrapper #(
     .S_AXI_HP1_bid(),
     .S_AXI_HP1_rid(),
     .S_AXI_HP1_rdata(dac_hp1_axi_rdata),
-    .S_AXI_HP1_ACLK(s_axi_clk),
+    .S_AXI_HP1_ACLK(m_axi_aclk),
     .S_AXI_HP1_arvalid(dac_hp1_axi_arvalid),
     .S_AXI_HP1_awvalid(1'b0),
     .S_AXI_HP1_bready(1'b0),
@@ -478,7 +481,7 @@ module system_wrapper #(
 
     .peripheral_aresetn(s_axi_aresetn),
     .pl_clk0(s_axi_clk),
-    .pl_clk1(),
+    .pl_clk1(m_axi_aclk),
     .pl_clk2(s_delay_clk),
     .pl_ps_irq1({{2{1'b0}}, s_adc_dma_irq, s_dac_dma_irq, {4{1'b0}}}),
 
@@ -487,7 +490,7 @@ module system_wrapper #(
     .spi0_mo_t(),
     .spi0_s_i(1'b0),
     .spi0_s_o(),
-    .spi0_sclk_i(1'b0),
+    .spi0_sclk_i(spi_clk),
     .spi0_sclk_o(spi_clk),
     .spi0_sclk_t(),
     .spi0_so_t(),

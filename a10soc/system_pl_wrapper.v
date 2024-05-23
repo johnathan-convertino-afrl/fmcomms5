@@ -239,6 +239,10 @@ module system_pl_wrapper #(
     .tdd_sync_1_i(tdd_sync_1_i),
     .tdd_sync_1_o(tdd_sync_1_o),
 
+    //dma
+    .m_axi_aclk(axi_aclk),
+    .m_axi_aresetn(axi_aresetn),
+
     //axi interface for the adc to the hp interface
     .adc_m_dest_axi_awaddr(adc_m_dest_axi_awaddr),
     .adc_m_dest_axi_awlen(adc_m_dest_axi_awlen),

@@ -121,6 +121,10 @@ module ad9361x2_pl_wrapper #(
     input         tdd_sync_1_i,
     output        tdd_sync_1_o,
 
+    //dma clock
+    input           m_axi_aclk,
+    input           m_axi_aresetn,
+
     //axi interface for the adc to the hp interface
     output [31:0]   adc_m_dest_axi_awaddr,
     output [ 3:0]   adc_m_dest_axi_awlen,
@@ -763,8 +767,8 @@ module ad9361x2_pl_wrapper #(
     .irq(adc_dma_irq),
 
     // Master AXI interface
-    .m_dest_axi_aclk(axi_aclk),
-    .m_dest_axi_aresetn(axi_aresetn),
+    .m_dest_axi_aclk(m_axi_aclk),
+    .m_dest_axi_aresetn(m_axi_aresetn),
 
     // Write address
     .m_dest_axi_awaddr(adc_m_dest_axi_awaddr),
@@ -1007,8 +1011,8 @@ module ad9361x2_pl_wrapper #(
     .m_dest_axi_rlast(1'b0),
 
     // Master AXI interface
-    .m_src_axi_aclk(axi_aclk),
-    .m_src_axi_aresetn(axi_aresetn),
+    .m_src_axi_aclk(m_axi_aclk),
+    .m_src_axi_aresetn(m_axi_aresetn),
 
     // Read address
     .m_src_axi_arready(dac_m_src_axi_arready),
