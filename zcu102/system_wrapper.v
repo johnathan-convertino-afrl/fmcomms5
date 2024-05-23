@@ -490,7 +490,7 @@ module system_wrapper #(
     .spi0_mo_t(),
     .spi0_s_i(1'b0),
     .spi0_s_o(),
-    .spi0_sclk_i(spi_clk),
+    .spi0_sclk_i(1'b0),
     .spi0_sclk_o(spi_clk),
     .spi0_sclk_t(),
     .spi0_so_t(),
