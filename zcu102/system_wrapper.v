@@ -32,7 +32,7 @@ module system_wrapper #(
     parameter SPEED_GRADE = 20,
     parameter DEV_PACKAGE = 3,
     parameter DELAY_REFCLK_FREQUENCY = 500,
-    parameter ADC_INIT_DELAY = 11,
+    parameter ADC_INIT_DELAY = 8,
     parameter DAC_INIT_DELAY = 0
   ) (
     input       [12:0]      gpio_bd_i,
