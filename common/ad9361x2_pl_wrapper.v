@@ -159,6 +159,13 @@ module ad9361x2_pl_wrapper #(
     input           dac_m_src_axi_rlast
   );
 
+  localparam SIM_DEVICE = (FPGA_TECHNOLOGY == 1)    ? "7SERIES"
+                        : (FPGA_TECHNOLOGY == 2)    ? "ULTRASCALE"
+                        : (FPGA_TECHNOLOGY == 3)    ? "ULTRASCALE"
+                        : (FPGA_TECHNOLOGY == 103)  ? "ARRIA10"
+                        : (FPGA_TECHNOLOGY == 101)  ? "CYCLONE5"
+                        : "INVALID";
+
   //AD9361 ID 0 AXI4LITE bus signals
   wire           ad9361_0_axi_awvalid;
   wire   [31:0]  ad9361_0_axi_awaddr;
@@ -1550,7 +1557,9 @@ module ad9361x2_pl_wrapper #(
     .dout_ovf(fifo_dout_ovf)
   );
 
-  util_clkdiv inst_clkdiv (
+  util_clkdiv #(
+    .SIM_DEVICE(SIM_DEVICE)
+  )  inst_clkdiv (
     .clk(l_clk),
     .clk_sel(adc_r1_mode_0 & dac_r1_mode_0 & adc_r1_mode_1 & dac_r1_mode_1),
     .clk_out(d_clk)
