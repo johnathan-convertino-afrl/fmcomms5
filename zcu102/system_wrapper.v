@@ -261,7 +261,7 @@ module system_wrapper #(
     .axi_aresetn(s_axi_aresetn),
 
     .s_axi_awvalid(w_axi_awvalid),
-    .s_axi_awaddr(w_axi_awaddr),
+    .s_axi_awaddr(w_axi_awaddr[31:0]),
     .s_axi_awready(w_axi_awready),
     .s_axi_awprot(w_axi_awprot),
     .s_axi_wvalid(w_axi_wvalid),
@@ -272,7 +272,7 @@ module system_wrapper #(
     .s_axi_bresp(w_axi_bresp),
     .s_axi_bready(w_axi_bready),
     .s_axi_arvalid(w_axi_arvalid),
-    .s_axi_araddr(w_axi_araddr),
+    .s_axi_araddr(w_axi_araddr[31:0]),
     .s_axi_arready(w_axi_arready),
     .s_axi_arprot(w_axi_arprot),
     .s_axi_rvalid(w_axi_rvalid),
