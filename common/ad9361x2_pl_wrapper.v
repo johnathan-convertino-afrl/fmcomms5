@@ -715,34 +715,6 @@ module ad9361x2_pl_wrapper #(
     .up_adc_gpio_in(0),
     .up_adc_gpio_out()
   );
-/*
-      .ID(0),
-    .DMA_DATA_WIDTH_SRC(128),
-    .DMA_DATA_WIDTH_DEST(64),
-    .DMA_LENGTH_WIDTH(24),
-    .DMA_2D_TRANSFER(1'B0),
-    .ASYNC_CLK_REQ_SRC(1'B1),
-    .ASYNC_CLK_SRC_DEST(1'B1),
-    .ASYNC_CLK_DEST_REQ(1'B1),
-    .AXI_SLICE_DEST(1'B0),
-    .AXI_SLICE_SRC(1'B1),
-    .SYNC_TRANSFER_START(1'B1),
-    .CYCLIC(1'B0),
-    .DMA_AXI_PROTOCOL_DEST(0),
-    .DMA_AXI_PROTOCOL_SRC(0),
-    .DMA_TYPE_DEST(0),
-    .DMA_TYPE_SRC(2),
-    .DMA_AXI_ADDR_WIDTH(31),
-    .MAX_BYTES_PER_BURST(128),
-    .FIFO_SIZE(8),
-    .AXI_ID_WIDTH_SRC(1),
-    .AXI_ID_WIDTH_DEST(1),
-    .DMA_AXIS_ID_W(8),
-    .DMA_AXIS_DEST_W(4),
-    .DISABLE_DEBUG_REGISTERS(1'B0),
-    .ENABLE_DIAGNOSTICS_IF(1'B0),
-    .ALLOW_ASYM_MEM(1),
-    .CACHE_COHERENT_DEST(1'B1)*/
 
   axi_dmac #(
     .ID(0),
@@ -940,35 +912,6 @@ module ad9361x2_pl_wrapper #(
     // Diagnostics interface
     .dest_diag_level_bursts()
   );
-
-
-    //   .ID(0),
-    // .DMA_DATA_WIDTH_SRC(64),
-    // .DMA_DATA_WIDTH_DEST(128),
-    // .DMA_LENGTH_WIDTH(24),
-    // .DMA_2D_TRANSFER(1'B0),
-    // .ASYNC_CLK_REQ_SRC(1'B1),
-    // .ASYNC_CLK_SRC_DEST(1'B1),
-    // .ASYNC_CLK_DEST_REQ(1'B1),
-    // .AXI_SLICE_DEST(1'B0),
-    // .AXI_SLICE_SRC(1'B0),
-    // .SYNC_TRANSFER_START(1'B0),
-    // .CYCLIC(1'B1),
-    // .DMA_AXI_PROTOCOL_DEST(0),
-    // .DMA_AXI_PROTOCOL_SRC(0),
-    // .DMA_TYPE_DEST(1),
-    // .DMA_TYPE_SRC(0),
-    // .DMA_AXI_ADDR_WIDTH(31),
-    // .MAX_BYTES_PER_BURST(128),
-    // .FIFO_SIZE(8),
-    // .AXI_ID_WIDTH_SRC(1),
-    // .AXI_ID_WIDTH_DEST(1),
-    // .DMA_AXIS_ID_W(8),
-    // .DMA_AXIS_DEST_W(4),
-    // .DISABLE_DEBUG_REGISTERS(1'B0),
-    // .ENABLE_DIAGNOSTICS_IF(1'B0),
-    // .ALLOW_ASYM_MEM(1),
-    // .CACHE_COHERENT_DEST(1'B0)
 
   axi_dmac #(
     .ID(0),
