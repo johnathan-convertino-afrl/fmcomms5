@@ -55,20 +55,6 @@ filesets:
     depend:
       - AFRL:utility:xilinx_zcu102_boot_gen:1.0.0
 
-  a10soc:
-    files:
-      - a10soc/system_constr.sdc : {file_type : SDC}
-      - a10soc/system_wrapper.v : {file_type : verilogSource}
-      - a10soc/system_pl_wrapper.v : {file_type : verilogSource}
-      - a10soc/system_pl_gen.tcl : {file_type : tclSource}
-      - a10soc/system_gen.tcl : {file_type : tclSource}
-    depend:
-      - AFRL:utility:intel_a10soc_board_base:1.0.0
-
-  a10soc_bootgen:
-    depend:
-      - AFRL:utility:intel_a10soc_boot_gen:1.0.0
-
   dep:
     depend:
       - AD:RF_Transceiver:axi_ad9361:1.0.0
@@ -137,18 +123,3 @@ targets:
     <<: *zcu102
     description: zcu102 build with boot.bin output in BOOTFS folder.
     filesets_append : [zcu102_bootgen]
-
-  a10soc: &a10soc
-    <<: *default
-    default_tool: quartus
-    description: a10soc target.
-    filesets_append : ["tool_quartus ? (a10soc)"]
-    tools:
-      quartus:
-        family: Arria 10
-        device: 10AS066N3F40E2SG
-
-  a10soc_bootgen:
-    <<: *a10soc
-    description: arria10 build with BOOTFS file generation.
-    filesets_append : [a10soc_bootgen]
