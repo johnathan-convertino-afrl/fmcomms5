@@ -269,33 +269,35 @@ module system_wrapper #(
   // assignments
 
   assign mcs_sync = r_mcs_sync;
+  
+  assign gpio_i[63:58] = gpio_o[63:58];
 
-  assign gpio_resetb_1 = gpio_o[0];
-  assign gpio_ad5355_rfen = gpio_o[63];
-  assign gpio_calsw_4_1 = gpio_o[62];
-  assign gpio_calsw_3_1 = gpio_o[61];
-  assign gpio_calsw_2_0 = gpio_o[60];
-  assign gpio_calsw_1_0 = gpio_o[59];
-  assign gpio_txnrx_1 = gpio_o[58];
-  assign gpio_enable_1 = gpio_o[57];
-  assign gpio_en_agc_1 = gpio_o[56];
-  assign gpio_txnrx_0 = gpio_o[55];
-  assign gpio_enable_0 = gpio_o[54];
-  assign gpio_en_agc_0 = gpio_o[53];
-  assign gpio_resetb_0 = gpio_o[52];
-  assign gpio_sync = gpio_o[51];
-  assign gpio_debug_4_0 = gpio_o[49];
-  assign gpio_debug_3_0 = gpio_o[48];
-  assign gpio_debug_2_0 = gpio_o[47];
-  assign gpio_debug_1_0 = gpio_o[46];
-  assign gpio_ctl_1 = gpio_o[45:42];
-  assign gpio_ctl_0 = gpio_o[41:38];
+  assign gpio_ad5355_rfen = gpio_o[57];
+  assign gpio_calsw_4_1 = gpio_o[56];
+  assign gpio_calsw_3_1 = gpio_o[55];
+  assign gpio_calsw_2_0 = gpio_o[54];
+  assign gpio_calsw_1_0 = gpio_o[53];
+  assign gpio_txnrx_1 = gpio_o[52];
+  assign gpio_enable_1 = gpio_o[51];
+  assign gpio_en_agc_1 = gpio_o[50];
+  assign gpio_txnrx_0 = gpio_o[49];
+  assign gpio_enable_0 = gpio_o[48];
+  assign gpio_en_agc_0 = gpio_o[47];
+  assign gpio_resetb_0 = gpio_o[46];
+  assign gpio_sync = gpio_o[45];
+  assign gpio_debug_4_0 = gpio_o[44];
+  assign gpio_debug_3_0 = gpio_o[43];
+  assign gpio_debug_2_0 = gpio_o[42];
+  assign gpio_debug_1_0 = gpio_o[41];
+  assign gpio_resetb_1 = gpio_o[40];
+  assign gpio_ctl_1 = gpio_o[39:36];
+  assign gpio_ctl_0 = gpio_o[35:32];
 
-  assign gpio_i[21:13] = gpio_o[21:13];
-  assign gpio_i[29:22] = gpio_status_0;
-  assign gpio_i[37:30] = gpio_status_1;
-  assign gpio_i[63:38] = gpio_o[63:38];
-  assign gpio_i[12] = gpio_ad5355_lock;
+  assign gpio_i[47:40] = gpio_status_0;
+  assign gpio_i[39:32] = gpio_status_1;
+  assign gpio_i[48] = gpio_ad5355_lock;
+  assign gpio_i[31:12] = gpio_o[31:12];
+  assign gpio_i[11: 4] = gpio_bd_i;
   assign gpio_i[3:0] = gpio_o[3:0];
 
   assign gpio_debug_3_1 = 1'b0;
@@ -303,9 +305,7 @@ module system_wrapper #(
 
   // board gpio
 
-  assign gpio_i[11: 4] = gpio_bd_i;
-  assign gpio_i[ 3: 0] = gpio_o[ 3: 0];
-  // assign gpio_bd_o = gpio_o[3:0];
+  assign gpio_bd_o = gpio_o[3:0];
 
   // peripheral reset
 
