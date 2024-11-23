@@ -1,0 +1,1 @@
+﻿NDFramePage.OnPageTitleLoaded("SystemVerilogModule:system_pl_wrapper","system_pl_wrapper");NDSummary.OnSummaryLoaded("SystemVerilogModule:system_pl_wrapper",[["SystemVerilog","SystemVerilog"]],[["Modules","Module"]],[[50,0,0,"system_pl_wrapper"]]);

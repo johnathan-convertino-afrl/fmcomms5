@@ -1,0 +1,1 @@
+﻿NDFramePage.OnPageTitleLoaded("SystemVerilogModule:inst_dac_axi_dmac","inst_dac_axi_dmac");NDSummary.OnSummaryLoaded("SystemVerilogModule:inst_dac_axi_dmac",[["SystemVerilog","SystemVerilog"]],[["Modules","Module"]],[[102,0,0,"inst_dac_axi_dmac"]]);

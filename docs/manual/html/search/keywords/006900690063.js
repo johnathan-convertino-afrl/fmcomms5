@@ -1,0 +1,1 @@
+﻿NDSearch.OnPrefixDataLoaded("iic",["Module"],[["iic_scl_iobuf",,[[,,,,0,"File2:system_pl_wrapper.v:iic_scl_iobuf","SystemVerilogModule:iic_scl_iobuf"]]],["iic_sda_iobuf",,[[,,,,0,"File2:system_pl_wrapper.v:iic_sda_iobuf","SystemVerilogModule:iic_sda_iobuf"]]]]);

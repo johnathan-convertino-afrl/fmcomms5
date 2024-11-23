@@ -1,0 +1,1 @@
+﻿NDSearch.OnPrefixDataLoaded("bri",["Information"],[["Brief",,[[,,,,0,"File:ad9361x2_pl_wrapper.v:Brief"]]]]);

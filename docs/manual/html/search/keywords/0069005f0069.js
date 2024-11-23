@@ -1,0 +1,1 @@
+﻿NDSearch.OnPrefixDataLoaded("i_i",["Module"],[["i_iobuf",,[[,,,,0,"File2:system_wrapper.v:i_iobuf","SystemVerilogModule:i_iobuf"]]]]);

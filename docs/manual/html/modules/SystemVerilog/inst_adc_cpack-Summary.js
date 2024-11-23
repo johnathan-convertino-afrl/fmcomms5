@@ -1,0 +1,1 @@
+﻿NDFramePage.OnPageTitleLoaded("SystemVerilogModule:inst_adc_cpack","inst_adc_cpack");NDSummary.OnSummaryLoaded("SystemVerilogModule:inst_adc_cpack",[["SystemVerilog","SystemVerilog"]],[["Modules","Module"]],[[103,0,0,"inst_adc_cpack"]]);

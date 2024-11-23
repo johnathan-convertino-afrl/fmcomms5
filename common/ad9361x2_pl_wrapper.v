@@ -1,31 +1,151 @@
 //******************************************************************************
-/// @FILE    ad9361x2_pl_wrapper.v
-/// @AUTHOR  JAY CONVERTINO
-/// @DATE    2024.03.25
-/// @BRIEF   AD9361 dual core and support core wrapper.
-///
-/// @LICENSE MIT
-///  Copyright 2024 Jay Convertino
-///
-///  Permission is hereby granted, free of charge, to any person obtaining a copy
-///  of this software and associated documentation files (the "Software"), to
-///  deal in the Software without restriction, including without limitation the
-///  rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
-///  sell copies of the Software, and to permit persons to whom the Software is
-///  furnished to do so, subject to the following conditions:
-///
-///  The above copyright notice and this permission notice shall be included in
-///  all copies or substantial portions of the Software.
-///
-///  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-///  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-///  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-///  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-///  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-///  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
-///  IN THE SOFTWARE.
+//  file:     ad9361x2_pl_wrapper.v
+//
+//  author:   JAY CONVERTINO
+//
+//  date:     2023/11/02
+//
+//  about:    Brief
+//  AD9361x2 core and support core wrapper.
+//
+//  license: License MIT
+//  Copyright 2023 Jay Convertino
+//
+//  Permission is hereby granted, free of charge, to any person obtaining a copy
+//  of this software and associated documentation files (the "Software"), to
+//  deal in the Software without restriction, including without limitation the
+//  rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+//  sell copies of the Software, and to permit persons to whom the Software is
+//  furnished to do so, subject to the following conditions:
+//
+//  The above copyright notice and this permission notice shall be included in
+//  all copies or substantial portions of the Software.
+//
+//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+//  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+//  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+//  IN THE SOFTWARE.
 //******************************************************************************
 
+/*
+ * Module: ad9361x2_pl_wrapper
+ *
+ * AD9361x2 core and support core wrapper.
+ *
+ * Parameters:
+ *
+ * FPGA_TECHNOLOGY        - Type of FPGA, such as Ultrascale, Arria 10. 1 is for 7 series.
+ * FPGA_FAMILY            - Sub type of fpga, such as GX, SX, etc. 4 is for zynq.
+ * SPEED_GRADE            - Number that corresponds to the ships recommeneded speed. 20 is for -2.
+ * DEV_PACKAGE            - Specify a number that is equal to the manufactures package. 3 is for ff.
+ * DELAY_REFCLK_FREQUENCY - Reference clock frequency used for ad_data_in instances
+ * ADC_INIT_DELAY         - Initial Delay for the ADC
+ * DAC_INIT_DELAY         - Initial Delay for the DAC
+ * DMA_AXI_PROTOCOL_TO_PS - Select DMA AXI standard, 1 = AXI3, 0 = AXI4
+ * AXI_DMAC_ADC_ADDR      - Set ADC AXI lite address.
+ * AXI_DMAC_DAC_ADDR      - Set DAC AXI lite address.
+ * AXI_AD9361_0_ADDR      - Set AD9361 0 AXI lite address.
+ * AXI_AD9361_1_ADDR      - Set AD9361 1 AXI lite address.
+ *
+ * Ports:
+ *
+ *  axi_aclk                      - AXI Lite control bus
+ *  axi_aresetn                   - AXI Lite control bus
+ *  s_axi_awvalid                 - AXI Lite control bus
+ *  s_axi_awaddr                  - AXI Lite control bus
+ *  s_axi_awready                 - AXI Lite control bus
+ *  s_axi_awprot                  - AXI Lite control bus
+ *  s_axi_wvalid                  - AXI Lite control bus
+ *  s_axi_wdata                   - AXI Lite control bus
+ *  s_axi_wstrb                   - AXI Lite control bus
+ *  s_axi_wready                  - AXI Lite control bus
+ *  s_axi_bvalid                  - AXI Lite control bus
+ *  s_axi_bresp                   - AXI Lite control bus
+ *  s_axi_bready                  - AXI Lite control bus
+ *  s_axi_arvalid                 - AXI Lite control bus
+ *  s_axi_araddr                  - AXI Lite control bus
+ *  s_axi_arready                 - AXI Lite control bus
+ *  s_axi_arprot                  - AXI Lite control bus
+ *  s_axi_rvalid                  - AXI Lite control bus
+ *  s_axi_rready                  - AXI Lite control bus
+ *  s_axi_rresp                   - AXI Lite control bus
+ *  s_axi_rdata                   - AXI Lite control bus
+ *  adc_dma_irq                   - fmcomms5 ADC irq
+ *  dac_dma_irq                   - fmcomms5 DAC irq
+ *  delay_clk                     - fmcomms5 delay clock
+ *  rx_clk_in_0_p                 - fmcomms5 0 rx clk
+ *  rx_clk_in_0_n                 - fmcomms5 0 rx clk
+ *  rx_frame_in_0_p               - fmcomms5 0 rx frame
+ *  rx_frame_in_0_n               - fmcomms5 0 rx frame
+ *  rx_data_in_0_p                - fmcomms5 0 rx data
+ *  rx_data_in_0_n                - fmcomms5 0 rx data
+ *  tx_clk_out_0_p                - fmcomms5 0 tx clk
+ *  tx_clk_out_0_n                - fmcomms5 0 tx clk
+ *  tx_frame_out_0_p              - fmcomms5 0 tx frame
+ *  tx_frame_out_0_n              - fmcomms5 0 tx frame
+ *  tx_data_out_0_p               - fmcomms5 0 tx data
+ *  tx_data_out_0_n               - fmcomms5 0 tx data
+ *  txnrx_0                       - fmcomms5 0 txnrx
+ *  enable_0                      - fmcomms5 0 enable
+ *  up_enable_0                   - fmcomms5 0 enable input
+ *  up_txnrx_0                    - fmcomms5 0 txnrx select input
+ *  tdd_sync_0_t                  - fmcomms5 0 TDD sync i/o
+ *  tdd_sync_0_i                  - fmcomms5 0 TDD sync i/o
+ *  tdd_sync_0_o                  - fmcomms5 0 TDD sync i/o
+ *  rx_clk_in_1_p                 - fmcomms5 1 rx clk
+ *  rx_clk_in_1_n                 - fmcomms5 1 rx clk
+ *  rx_frame_in_1_p               - fmcomms5 1 rx frame
+ *  rx_frame_in_1_n               - fmcomms5 1 rx frame
+ *  rx_data_in_1_p                - fmcomms5 1 rx data
+ *  rx_data_in_1_n                - fmcomms5 1 rx data
+ *  tx_clk_out_1_p                - fmcomms5 1 tx clk
+ *  tx_clk_out_1_n                - fmcomms5 1 tx clk
+ *  tx_frame_out_1_p              - fmcomms5 1 tx frame
+ *  tx_frame_out_1_n              - fmcomms5 1 tx frame
+ *  tx_data_out_1_p               - fmcomms5 1 tx data
+ *  tx_data_out_1_n               - fmcomms5 1 tx data
+ *  txnrx_1                       - fmcomms5 1 txnrx
+ *  enable_1                      - fmcomms5 1 enable
+ *  up_enable_1                   - fmcomms5 1 enable input
+ *  up_txnrx_1                    - fmcomms5 1 txnrx select input
+ *  tdd_sync_1_t                  - fmcomms5 1 TDD sync i/o
+ *  tdd_sync_1_i                  - fmcomms5 1 TDD sync i/o
+ *  tdd_sync_1_o                  - fmcomms5 1 TDD sync i/o
+ *  m_axi_aclk                    - DMA Clock
+ *  m_axi_aresetn                 - DMA Negative Reset
+ *  adc_m_dest_axi_awaddr         - fmcomms5 ADC DMA
+ *  adc_m_dest_axi_awlen          - fmcomms5 ADC DMA
+ *  adc_m_dest_axi_awsize         - fmcomms5 ADC DMA
+ *  adc_m_dest_axi_awburst        - fmcomms5 ADC DMA
+ *  adc_m_dest_axi_awprot         - fmcomms5 ADC DMA
+ *  adc_m_dest_axi_awcache        - fmcomms5 ADC DMA
+ *  adc_m_dest_axi_awvalid        - fmcomms5 ADC DMA
+ *  adc_m_dest_axi_awready        - fmcomms5 ADC DMA
+ *  adc_m_dest_axi_wdata          - fmcomms5 ADC DMA
+ *  adc_m_dest_axi_wstrb          - fmcomms5 ADC DMA
+ *  adc_m_dest_axi_wready         - fmcomms5 ADC DMA
+ *  adc_m_dest_axi_wvalid         - fmcomms5 ADC DMA
+ *  adc_m_dest_axi_wlast          - fmcomms5 ADC DMA
+ *  adc_m_dest_axi_bvalid         - fmcomms5 ADC DMA
+ *  adc_m_dest_axi_bresp          - fmcomms5 ADC DMA
+ *  adc_m_dest_axi_bready         - fmcomms5 ADC DMA
+ *  dac_m_src_axi_arready         - fmcomms5 DAC DMA
+ *  dac_m_src_axi_arvalid         - fmcomms5 DAC DMA
+ *  dac_m_src_axi_araddr          - fmcomms5 DAC DMA
+ *  dac_m_src_axi_arlen           - fmcomms5 DAC DMA
+ *  dac_m_src_axi_arsize          - fmcomms5 DAC DMA
+ *  dac_m_src_axi_arburst         - fmcomms5 DAC DMA
+ *  dac_m_src_axi_arprot          - fmcomms5 DAC DMA
+ *  dac_m_src_axi_arcache         - fmcomms5 DAC DMA
+ *  dac_m_src_axi_rdata           - fmcomms5 DAC DMA
+ *  dac_m_src_axi_rready          - fmcomms5 DAC DMA
+ *  dac_m_src_axi_rvalid          - fmcomms5 DAC DMA
+ *  dac_m_src_axi_rresp           - fmcomms5 DAC DMA
+ *  dac_m_src_axi_rlast           - fmcomms5 DAC DMA
+ */
 module ad9361x2_pl_wrapper #(
     parameter FPGA_TECHNOLOGY = 0,
     parameter FPGA_FAMILY = 0,
@@ -34,98 +154,76 @@ module ad9361x2_pl_wrapper #(
     parameter ADC_INIT_DELAY = 23,
     parameter DAC_INIT_DELAY = 0,
     parameter DELAY_REFCLK_FREQUENCY = 200,
-    parameter DMA_AXI_PROTOCOL_TO_PS = 1, //1 = AXI3, 0 = AXI4
+    parameter DMA_AXI_PROTOCOL_TO_PS = 1,
     parameter AXI_DMAC_ADC_ADDR = 32'h7C400000,
     parameter AXI_DMAC_DAC_ADDR = 32'h7C420000,
     parameter AXI_AD9361_0_ADDR = 32'h79020000,
     parameter AXI_AD9361_1_ADDR = 32'h79040000
   ) (
-    //AXI4LITE SLAVE INTERFACE TO CROSSBAR
-    input axi_aclk,
-    input axi_aresetn,
-
-    input         s_axi_awvalid,
-    input  [31:0] s_axi_awaddr,
-    output        s_axi_awready,
-    input   [2:0] s_axi_awprot,
-    input         s_axi_wvalid,
-    input  [31:0] s_axi_wdata,
-    input  [ 3:0] s_axi_wstrb,
-    output        s_axi_wready,
-    output        s_axi_bvalid,
-    output [ 1:0] s_axi_bresp,
-    input         s_axi_bready,
-    input         s_axi_arvalid,
-    input  [31:0] s_axi_araddr,
-    output        s_axi_arready,
-    input   [2:0] s_axi_arprot,
-    output        s_axi_rvalid,
-    input         s_axi_rready,
-    output [ 1:0] s_axi_rresp,
-    output [31:0] s_axi_rdata,
-
-    //irq
-    output        adc_dma_irq,
-    output        dac_dma_irq,
-
-    //AD9361 IO
-    //common
-    //clocks
-    input         delay_clk,
-    //ID 0
-    //RX LVDS
-    input         rx_clk_in_0_p,
-    input         rx_clk_in_0_n,
-    input         rx_frame_in_0_p,
-    input         rx_frame_in_0_n,
-    input   [5:0] rx_data_in_0_p,
-    input   [5:0] rx_data_in_0_n,
-    //TX LVDS
-    output        tx_clk_out_0_p,
-    output        tx_clk_out_0_n,
-    output        tx_frame_out_0_p,
-    output        tx_frame_out_0_n,
-    output  [5:0] tx_data_out_0_p,
-    output  [5:0] tx_data_out_0_n,
-    //MISC
-    output        enable_0,
-    output        txnrx_0,
-    input         up_enable_0,
-    input         up_txnrx_0,
-    //sync
-    output        tdd_sync_0_t,
-    input         tdd_sync_0_i,
-    output        tdd_sync_0_o,
-    //ID 1
-    //RX LVDS
-    input         rx_clk_in_1_p,
-    input         rx_clk_in_1_n,
-    input         rx_frame_in_1_p,
-    input         rx_frame_in_1_n,
-    input   [5:0] rx_data_in_1_p,
-    input   [5:0] rx_data_in_1_n,
-    //TX LVDS
-    output        tx_clk_out_1_p,
-    output        tx_clk_out_1_n,
-    output        tx_frame_out_1_p,
-    output        tx_frame_out_1_n,
-    output  [5:0] tx_data_out_1_p,
-    output  [5:0] tx_data_out_1_n,
-    //MISC
-    output        enable_1,
-    output        txnrx_1,
-    input         up_enable_1,
-    input         up_txnrx_1,
-    //sync
-    output        tdd_sync_1_t,
-    input         tdd_sync_1_i,
-    output        tdd_sync_1_o,
-
-    //dma clock
+    input           axi_aclk,
+    input           axi_aresetn,
+    input           s_axi_awvalid,
+    input  [31:0]   s_axi_awaddr,
+    output          s_axi_awready,
+    input   [2:0]   s_axi_awprot,
+    input           s_axi_wvalid,
+    input  [31:0]   s_axi_wdata,
+    input  [ 3:0]   s_axi_wstrb,
+    output          s_axi_wready,
+    output          s_axi_bvalid,
+    output [ 1:0]   s_axi_bresp,
+    input           s_axi_bready,
+    input           s_axi_arvalid,
+    input  [31:0]   s_axi_araddr,
+    output          s_axi_arready,
+    input   [2:0]   s_axi_arprot,
+    output          s_axi_rvalid,
+    input           s_axi_rready,
+    output [ 1:0]   s_axi_rresp,
+    output [31:0]   s_axi_rdata,
+    output          adc_dma_irq,
+    output          dac_dma_irq,
+    input           delay_clk,
+    input           rx_clk_in_0_p,
+    input           rx_clk_in_0_n,
+    input           rx_frame_in_0_p,
+    input           rx_frame_in_0_n,
+    input   [5:0]   rx_data_in_0_p,
+    input   [5:0]   rx_data_in_0_n,
+    output          tx_clk_out_0_p,
+    output          tx_clk_out_0_n,
+    output          tx_frame_out_0_p,
+    output          tx_frame_out_0_n,
+    output  [5:0]   tx_data_out_0_p,
+    output  [5:0]   tx_data_out_0_n,
+    output          enable_0,
+    output          txnrx_0,
+    input           up_enable_0,
+    input           up_txnrx_0,
+    output          tdd_sync_0_t,
+    input           tdd_sync_0_i,
+    output          tdd_sync_0_o,
+    input           rx_clk_in_1_p,
+    input           rx_clk_in_1_n,
+    input           rx_frame_in_1_p,
+    input           rx_frame_in_1_n,
+    input   [5:0]   rx_data_in_1_p,
+    input   [5:0]   rx_data_in_1_n,
+    output          tx_clk_out_1_p,
+    output          tx_clk_out_1_n,
+    output          tx_frame_out_1_p,
+    output          tx_frame_out_1_n,
+    output  [5:0]   tx_data_out_1_p,
+    output  [5:0]   tx_data_out_1_n,
+    output          enable_1,
+    output          txnrx_1,
+    input           up_enable_1,
+    input           up_txnrx_1,
+    output          tdd_sync_1_t,
+    input           tdd_sync_1_i,
+    output          tdd_sync_1_o,
     input           m_axi_aclk,
     input           m_axi_aresetn,
-
-    //axi interface for the adc to the hp interface
     output [31:0]   adc_m_dest_axi_awaddr,
     output [ 3:0]   adc_m_dest_axi_awlen,
     output [ 2:0]   adc_m_dest_axi_awsize,
@@ -142,8 +240,6 @@ module ad9361x2_pl_wrapper #(
     input           adc_m_dest_axi_bvalid,
     input  [ 1:0]   adc_m_dest_axi_bresp,
     output          adc_m_dest_axi_bready,
-
-    //axi interface for dac to the hp interface
     input           dac_m_src_axi_arready,
     output          dac_m_src_axi_arvalid,
     output [31:0]   dac_m_src_axi_araddr,
@@ -420,8 +516,12 @@ module ad9361x2_pl_wrapper #(
 
   assign fifo_wr_en = fifo_adc_valid_i0 | fifo_adc_valid_i1 | fifo_adc_valid_q0 | fifo_adc_valid_q1 | fifo_adc_valid_i2 | fifo_adc_valid_q2 | fifo_adc_valid_i3 | fifo_adc_valid_q3;
 
+  // Group: Instantianted Modules
+
+  // Module: inst_axi_ad9361_0
+  //
+  // Analog Devices ad9361 0 interface core
   axi_ad9361 #(
-    // parameters
     .ID(0),
     .MODE_1R1T(0),
     .FPGA_TECHNOLOGY(FPGA_TECHNOLOGY),
@@ -448,64 +548,41 @@ module ad9361x2_pl_wrapper #(
     .DAC_USERPORTS_DISABLE(0),
     .DAC_IQCORRECTION_DISABLE(0),
     .IO_DELAY_GROUP("dev_0_if_delay_group"),
-    // .IODELAY_CTRL(1),
     .MIMO_ENABLE(0),
     .USE_SSI_CLK(1),
     .DELAY_REFCLK_FREQUENCY(DELAY_REFCLK_FREQUENCY),
     .RX_NODPA(0)
   ) inst_axi_ad9361_0 (
-
-    // physical interface (receive-lvds)
     .rx_clk_in_p(rx_clk_in_0_p),
     .rx_clk_in_n(rx_clk_in_0_n),
     .rx_frame_in_p(rx_frame_in_0_p),
     .rx_frame_in_n(rx_frame_in_0_n),
     .rx_data_in_p(rx_data_in_0_p),
     .rx_data_in_n(rx_data_in_0_n),
-
-    // physical interface (receive-cmos) NOT USED
     .rx_clk_in(1'b0),
     .rx_frame_in(1'b0),
     .rx_data_in(0),
-
-    // physical interface (transmit-lvds)
     .tx_clk_out_p(tx_clk_out_0_p),
     .tx_clk_out_n(tx_clk_out_0_n),
     .tx_frame_out_p(tx_frame_out_0_p),
     .tx_frame_out_n(tx_frame_out_0_n),
     .tx_data_out_p(tx_data_out_0_p),
     .tx_data_out_n(tx_data_out_0_n),
-
-    // physical interface (transmit-cmos) NOT USED
     .tx_clk_out(),
     .tx_frame_out(),
     .tx_data_out(),
-
-    // ensm control
     .enable(enable_0),
     .txnrx(txnrx_0),
-
-    // transmit master/slave
     .dac_sync_in(dac_sync_out),
     .dac_sync_out(dac_sync_out),
-
-    // tdd sync
     .tdd_sync(sync_out_0),
     .tdd_sync_cntr(tdd_sync_cntr_0),
-
-    //gps NOT USED
     .gps_pps(1'b0),
     .gps_pps_irq(),
-
-    // delay clock
     .delay_clk(delay_clk),
-
-    // master interface
     .l_clk(l_clk),
     .clk(l_clk),
     .rst(ad_reset_o),
-
-    // dma interface
     .adc_enable_i0(adc_enable_i0),
     .adc_valid_i0(adc_valid_i0),
     .adc_data_i0(adc_data_i0),
@@ -520,7 +597,6 @@ module ad9361x2_pl_wrapper #(
     .adc_data_q1(adc_data_q1),
     .adc_dovf(din_ovf),
     .adc_r1_mode(adc_r1_mode_0),
-
     .dac_enable_i0(dac_enable_i0),
     .dac_valid_i0(dac_valid_i0),
     .dac_data_i0(dac_data_i0),
@@ -535,8 +611,6 @@ module ad9361x2_pl_wrapper #(
     .dac_data_q1(dac_data_q1),
     .dac_dunf(dac_dunf),
     .dac_r1_mode(dac_r1_mode_0),
-
-    // axi interface
     .s_axi_aclk(axi_aclk),
     .s_axi_aresetn(axi_aresetn),
     .s_axi_awvalid(ad9361_0_axi_awvalid),
@@ -558,8 +632,6 @@ module ad9361x2_pl_wrapper #(
     .s_axi_rdata(ad9361_0_axi_rdata),
     .s_axi_rresp(ad9361_0_axi_rresp),
     .s_axi_rready(ad9361_0_axi_rready),
-
-    // gpio
     .up_enable(up_enable_0),
     .up_txnrx(up_txnrx_0),
     .up_dac_gpio_in(0),
@@ -568,8 +640,10 @@ module ad9361x2_pl_wrapper #(
     .up_adc_gpio_out()
   );
 
+  // Module: inst_axi_ad9361_1
+  //
+  // Analog Devices ad9361 1 interface core
   axi_ad9361 #(
-    // parameters
     .ID(1),
     .MODE_1R1T(0),
     .FPGA_TECHNOLOGY(FPGA_TECHNOLOGY),
@@ -596,64 +670,41 @@ module ad9361x2_pl_wrapper #(
     .DAC_USERPORTS_DISABLE(0),
     .DAC_IQCORRECTION_DISABLE(0),
     .IO_DELAY_GROUP("dev_1_if_delay_group"),
-    // .IODELAY_CTRL(1),
     .MIMO_ENABLE(0),
     .USE_SSI_CLK(0),
     .DELAY_REFCLK_FREQUENCY(DELAY_REFCLK_FREQUENCY),
     .RX_NODPA(0)
   ) inst_axi_ad9361_1 (
-
-    // physical interface (receive-lvds)
     .rx_clk_in_p(rx_clk_in_1_p),
     .rx_clk_in_n(rx_clk_in_1_n),
     .rx_frame_in_p(rx_frame_in_1_p),
     .rx_frame_in_n(rx_frame_in_1_n),
     .rx_data_in_p(rx_data_in_1_p),
     .rx_data_in_n(rx_data_in_1_n),
-
-    // physical interface (receive-cmos) NOT USED
     .rx_clk_in(1'b0),
     .rx_frame_in(1'b0),
     .rx_data_in(0),
-
-    // physical interface (transmit-lvds)
     .tx_clk_out_p(tx_clk_out_1_p),
     .tx_clk_out_n(tx_clk_out_1_n),
     .tx_frame_out_p(tx_frame_out_1_p),
     .tx_frame_out_n(tx_frame_out_1_n),
     .tx_data_out_p(tx_data_out_1_p),
     .tx_data_out_n(tx_data_out_1_n),
-
-    // physical interface (transmit-cmos) NOT USED
     .tx_clk_out(),
     .tx_frame_out(),
     .tx_data_out(),
-
-    // ensm control
     .enable(enable_1),
     .txnrx(txnrx_1),
-
-    // transmit master/slave NOT USED
     .dac_sync_in(dac_sync_out),
     .dac_sync_out(),
-
-    // tdd sync
     .tdd_sync(sync_out_1),
     .tdd_sync_cntr(tdd_sync_cntr_1),
-
-    //gps NOT USED
     .gps_pps(1'b0),
     .gps_pps_irq(),
-
-    // delay clock
     .delay_clk(delay_clk),
-
-    // master interface
     .l_clk(),
     .clk(l_clk),
     .rst(),
-
-    // dma interface
     .adc_enable_i0(adc_enable_i2),
     .adc_valid_i0(adc_valid_i2),
     .adc_data_i0(adc_data_i2),
@@ -668,7 +719,6 @@ module ad9361x2_pl_wrapper #(
     .adc_data_q1(adc_data_q3),
     .adc_dovf(din_ovf),
     .adc_r1_mode(adc_r1_mode_1),
-
     .dac_enable_i0(dac_enable_i2),
     .dac_valid_i0(dac_valid_i2),
     .dac_data_i0(dac_data_i2),
@@ -683,8 +733,6 @@ module ad9361x2_pl_wrapper #(
     .dac_data_q1(dac_data_q3),
     .dac_dunf(dac_dunf),
     .dac_r1_mode(dac_r1_mode_1),
-
-    // axi interface
     .s_axi_aclk(axi_aclk),
     .s_axi_aresetn(axi_aresetn),
     .s_axi_awvalid(ad9361_1_axi_awvalid),
@@ -706,8 +754,6 @@ module ad9361x2_pl_wrapper #(
     .s_axi_rdata(ad9361_1_axi_rdata),
     .s_axi_rresp(ad9361_1_axi_rresp),
     .s_axi_rready(ad9361_1_axi_rready),
-
-    // gpio
     .up_enable(up_enable_1),
     .up_txnrx(up_txnrx_1),
     .up_dac_gpio_in(0),
@@ -716,6 +762,9 @@ module ad9361x2_pl_wrapper #(
     .up_adc_gpio_out()
   );
 
+  // Module: inst_adc_axi_dmac
+  //
+  // Analog Devices DMA for AD9361 ADC
   axi_dmac #(
     .ID(0),
     .DMA_DATA_WIDTH_SRC(128),
@@ -729,13 +778,13 @@ module ad9361x2_pl_wrapper #(
     .AXI_SLICE_SRC(1),
     .SYNC_TRANSFER_START(1),
     .CYCLIC(0),
-    .DMA_AXI_PROTOCOL_DEST(DMA_AXI_PROTOCOL_TO_PS), //1 = AXI3, 0 = AXI4
+    .DMA_AXI_PROTOCOL_DEST(DMA_AXI_PROTOCOL_TO_PS),
     .DMA_AXI_PROTOCOL_SRC(1),
     .DMA_TYPE_DEST(0),
     .DMA_TYPE_SRC(1),
     .DMA_AXI_ADDR_WIDTH(32),
     .MAX_BYTES_PER_BURST(128),
-    .FIFO_SIZE(8), // In bursts
+    .FIFO_SIZE(8),
     .AXI_ID_WIDTH_SRC(6),
     .AXI_ID_WIDTH_DEST(6),
     .DMA_AXIS_ID_W(8),
@@ -745,11 +794,8 @@ module ad9361x2_pl_wrapper #(
     .ALLOW_ASYM_MEM(1),
     .CACHE_COHERENT_DEST(1)
   ) inst_adc_axi_dmac (
-
-    // Slave AXI interface
     .s_axi_aclk(axi_aclk),
     .s_axi_aresetn(axi_aresetn),
-
     .s_axi_awvalid(adc_dma_axi_awvalid),
     .s_axi_awaddr(adc_dma_axi_awaddr[10:0]),
     .s_axi_awready(adc_dma_axi_awready),
@@ -769,15 +815,9 @@ module ad9361x2_pl_wrapper #(
     .s_axi_rready(adc_dma_axi_rready),
     .s_axi_rresp(adc_dma_axi_rresp),
     .s_axi_rdata(adc_dma_axi_rdata),
-
-    // Interrupt
     .irq(adc_dma_irq),
-
-    // Master AXI interface
     .m_dest_axi_aclk(m_axi_aclk),
     .m_dest_axi_aresetn(m_axi_aresetn),
-
-    // Write address
     .m_dest_axi_awaddr(adc_m_dest_axi_awaddr),
     .m_dest_axi_awlen(adc_m_dest_axi_awlen),
     .m_dest_axi_awsize(adc_m_dest_axi_awsize),
@@ -788,22 +828,16 @@ module ad9361x2_pl_wrapper #(
     .m_dest_axi_awready(adc_m_dest_axi_awready),
     .m_dest_axi_awid(),
     .m_dest_axi_awlock(),
-
-    // Write data
     .m_dest_axi_wdata(adc_m_dest_axi_wdata),
     .m_dest_axi_wstrb(adc_m_dest_axi_wstrb),
     .m_dest_axi_wready(adc_m_dest_axi_wready),
     .m_dest_axi_wvalid(adc_m_dest_axi_wvalid),
     .m_dest_axi_wlast(adc_m_dest_axi_wlast),
     .m_dest_axi_wid(),
-
-    // Write response
     .m_dest_axi_bvalid(adc_m_dest_axi_bvalid),
     .m_dest_axi_bresp(adc_m_dest_axi_bresp),
     .m_dest_axi_bready(adc_m_dest_axi_bready),
     .m_dest_axi_bid(1'b0),
-
-    // Unused read interface
     .m_dest_axi_arvalid(),
     .m_dest_axi_araddr(),
     .m_dest_axi_arlen(),
@@ -820,12 +854,8 @@ module ad9361x2_pl_wrapper #(
     .m_dest_axi_arlock(),
     .m_dest_axi_rid(1'b0),
     .m_dest_axi_rlast(1'b0),
-
-    // Master AXI interface
     .m_src_axi_aclk(1'b0),
     .m_src_axi_aresetn(1'b0),
-
-    // Read address
     .m_src_axi_arready(1'b0),
     .m_src_axi_arvalid(),
     .m_src_axi_araddr(),
@@ -836,16 +866,12 @@ module ad9361x2_pl_wrapper #(
     .m_src_axi_arcache(),
     .m_src_axi_arid(),
     .m_src_axi_arlock(),
-
-    // Read data and response
     .m_src_axi_rdata(0),
     .m_src_axi_rready(),
     .m_src_axi_rvalid(1'b0),
     .m_src_axi_rresp(0),
     .m_src_axi_rid(0),
     .m_src_axi_rlast(1'b0),
-
-    // Unused write interface
     .m_src_axi_awvalid(),
     .m_src_axi_awaddr(),
     .m_src_axi_awlen(),
@@ -866,8 +892,6 @@ module ad9361x2_pl_wrapper #(
     .m_src_axi_awlock(),
     .m_src_axi_wid(),
     .m_src_axi_bid(1'b0),
-
-    // Slave streaming AXI interface
     .s_axis_aclk(d_clk),
     .s_axis_ready(fifo_m_axis_tready),
     .s_axis_valid(fifo_m_axis_tvalid),
@@ -879,8 +903,6 @@ module ad9361x2_pl_wrapper #(
     .s_axis_dest(0),
     .s_axis_last(1'b0),
     .s_axis_xfer_req(),
-
-    // Master streaming AXI interface
     .m_axis_aclk(1'b0),
     .m_axis_ready(1'b0),
     .m_axis_valid(),
@@ -892,27 +914,24 @@ module ad9361x2_pl_wrapper #(
     .m_axis_dest(),
     .m_axis_last(),
     .m_axis_xfer_req(),
-
-    // Input FIFO interface
     .fifo_wr_clk(1'b0),
     .fifo_wr_en(1'b0),
     .fifo_wr_din(0),
     .fifo_wr_overflow(),
     .fifo_wr_sync(1'b0),
     .fifo_wr_xfer_req(),
-
-    // Input FIFO interface
     .fifo_rd_clk(1'b0),
     .fifo_rd_en(1'b0),
     .fifo_rd_valid(),
     .fifo_rd_dout(),
     .fifo_rd_underflow(),
     .fifo_rd_xfer_req(),
-
-    // Diagnostics interface
     .dest_diag_level_bursts()
   );
 
+  // Module: inst_dac_axi_dmac
+  //
+  // Analog Devices DMA for AD9361 DAC
   axi_dmac #(
     .ID(0),
     .DMA_DATA_WIDTH_SRC(64),
@@ -927,12 +946,12 @@ module ad9361x2_pl_wrapper #(
     .SYNC_TRANSFER_START(0),
     .CYCLIC(1),
     .DMA_AXI_PROTOCOL_DEST(1),
-    .DMA_AXI_PROTOCOL_SRC(DMA_AXI_PROTOCOL_TO_PS), //1 = AXI3, 0 = AXI4
+    .DMA_AXI_PROTOCOL_SRC(DMA_AXI_PROTOCOL_TO_PS),
     .DMA_TYPE_DEST(1),
     .DMA_TYPE_SRC(0),
     .DMA_AXI_ADDR_WIDTH(32),
     .MAX_BYTES_PER_BURST(128),
-    .FIFO_SIZE(8), // In bursts
+    .FIFO_SIZE(8),
     .AXI_ID_WIDTH_SRC(6),
     .AXI_ID_WIDTH_DEST(6),
     .DMA_AXIS_ID_W(8),
@@ -942,10 +961,8 @@ module ad9361x2_pl_wrapper #(
     .ALLOW_ASYM_MEM(1),
     .CACHE_COHERENT_DEST(0)
   ) inst_dac_axi_dmac (
-    // Slave AXI interface
     .s_axi_aclk(axi_aclk),
     .s_axi_aresetn(axi_aresetn),
-
     .s_axi_awvalid(dac_dma_axi_awvalid),
     .s_axi_awaddr(dac_dma_axi_awaddr[10:0]),
     .s_axi_awready(dac_dma_axi_awready),
@@ -965,15 +982,9 @@ module ad9361x2_pl_wrapper #(
     .s_axi_rready(dac_dma_axi_rready),
     .s_axi_rresp(dac_dma_axi_rresp),
     .s_axi_rdata(dac_dma_axi_rdata),
-
-    // Interrupt
     .irq(dac_dma_irq),
-
-    // Master AXI interface
     .m_dest_axi_aclk(1'b0),
     .m_dest_axi_aresetn(1'b0),
-
-    // Write address
     .m_dest_axi_awaddr(),
     .m_dest_axi_awlen(),
     .m_dest_axi_awsize(),
@@ -984,22 +995,16 @@ module ad9361x2_pl_wrapper #(
     .m_dest_axi_awready(1'b0),
     .m_dest_axi_awid(),
     .m_dest_axi_awlock(),
-
-    // Write data
     .m_dest_axi_wdata(),
     .m_dest_axi_wstrb(),
     .m_dest_axi_wready(1'b0),
     .m_dest_axi_wvalid(),
     .m_dest_axi_wlast(),
     .m_dest_axi_wid(),
-
-    // Write response
     .m_dest_axi_bvalid(1'b0),
     .m_dest_axi_bresp(0),
     .m_dest_axi_bready(),
     .m_dest_axi_bid(0),
-
-    // Unused read interface
     .m_dest_axi_arvalid(),
     .m_dest_axi_araddr(),
     .m_dest_axi_arlen(),
@@ -1016,12 +1021,8 @@ module ad9361x2_pl_wrapper #(
     .m_dest_axi_arlock(),
     .m_dest_axi_rid(0),
     .m_dest_axi_rlast(1'b0),
-
-    // Master AXI interface
     .m_src_axi_aclk(m_axi_aclk),
     .m_src_axi_aresetn(m_axi_aresetn),
-
-    // Read address
     .m_src_axi_arready(dac_m_src_axi_arready),
     .m_src_axi_arvalid(dac_m_src_axi_arvalid),
     .m_src_axi_araddr(dac_m_src_axi_araddr),
@@ -1030,18 +1031,14 @@ module ad9361x2_pl_wrapper #(
     .m_src_axi_arburst(dac_m_src_axi_arburst),
     .m_src_axi_arprot(dac_m_src_axi_arprot),
     .m_src_axi_arcache(dac_m_src_axi_arcache),
-    .m_src_axi_arid(),        //not connected in gen
-    .m_src_axi_arlock(),    //not connected in gen
-
-    // Read data and response
+    .m_src_axi_arid(),
+    .m_src_axi_arlock(),
     .m_src_axi_rdata(dac_m_src_axi_rdata),
     .m_src_axi_rready(dac_m_src_axi_rready),
     .m_src_axi_rvalid(dac_m_src_axi_rvalid),
     .m_src_axi_rresp(dac_m_src_axi_rresp),
-    .m_src_axi_rid(1'b0),        //1'b0?
+    .m_src_axi_rid(1'b0),
     .m_src_axi_rlast(dac_m_src_axi_rlast),
-
-    // Unused write interface
     .m_src_axi_awvalid(),
     .m_src_axi_awaddr(),
     .m_src_axi_awlen(),
@@ -1062,8 +1059,6 @@ module ad9361x2_pl_wrapper #(
     .m_src_axi_awlock(),
     .m_src_axi_wid(),
     .m_src_axi_bid(1'b0),
-
-    // Slave streaming AXI interface
     .s_axis_aclk(1'b0),
     .s_axis_ready(),
     .s_axis_valid(1'b0),
@@ -1075,49 +1070,42 @@ module ad9361x2_pl_wrapper #(
     .s_axis_dest(0),
     .s_axis_last(1'b0),
     .s_axis_xfer_req(),
-
-    // Master streaming AXI interface
     .m_axis_aclk(d_clk),
     .m_axis_ready(fifo_s_axis_ready),
     .m_axis_valid(fifo_s_axis_valid),
     .m_axis_data(fifo_s_axis_data),
-    .m_axis_strb(), //signals?
-    .m_axis_keep(), //signals?
-    .m_axis_user(), //signals?
-    .m_axis_id(),   //signals?
-    .m_axis_dest(), //signals?
-    .m_axis_last(), //signals?
-    .m_axis_xfer_req(), //signals?
-
-    // Input FIFO interface
+    .m_axis_strb(),
+    .m_axis_keep(),
+    .m_axis_user(),
+    .m_axis_id(),
+    .m_axis_dest(),
+    .m_axis_last(),
+    .m_axis_xfer_req(),
     .fifo_wr_clk(1'b0),
     .fifo_wr_en(1'b0),
     .fifo_wr_din(0),
     .fifo_wr_overflow(),
     .fifo_wr_sync(1'b1),
     .fifo_wr_xfer_req(),
-
-    // Input FIFO interface
     .fifo_rd_clk(1'b0),
     .fifo_rd_en(1'b0),
     .fifo_rd_valid(),
     .fifo_rd_dout(),
     .fifo_rd_underflow(),
     .fifo_rd_xfer_req(),
-
-    // Diagnostics interface
     .dest_diag_level_bursts()
   );
 
+  // Module: inst_adc_cpack
+  //
+  // Analog Devices Utility to take ad9361 data and pack it to a AXIS bus for the ADC
   util_cpack2_axis #(
     .NUM_OF_CHANNELS(8),
     .SAMPLES_PER_CHANNEL(1),
     .SAMPLE_DATA_WIDTH(16)
   ) inst_adc_cpack (
-
     .clk(d_clk),
     .reset(p_reset),
-
     .enable_0(fifo_adc_enable_i0),
     .enable_1(fifo_adc_enable_q0),
     .enable_2(fifo_adc_enable_i1),
@@ -1182,10 +1170,8 @@ module ad9361x2_pl_wrapper #(
     .enable_61(1'b0),
     .enable_62(1'b0),
     .enable_63(1'b0),
-
     .fifo_wr_en(fifo_wr_en),
     .fifo_wr_overflow(fifo_dout_ovf),
-
     .fifo_wr_data_0(fifo_adc_data_i0),
     .fifo_wr_data_1(fifo_adc_data_q0),
     .fifo_wr_data_2(fifo_adc_data_i1),
@@ -1250,22 +1236,22 @@ module ad9361x2_pl_wrapper #(
     .fifo_wr_data_61(0),
     .fifo_wr_data_62(0),
     .fifo_wr_data_63(0),
-
     .m_axis_tdata(fifo_m_axis_tdata),
     .m_axis_tvalid(fifo_m_axis_tvalid),
     .m_axis_tready(fifo_m_axis_tready),
     .m_axis_tuser(fifo_m_axis_tuser)
   );
 
+  // Module: inst_dac_cpack
+  //
+  // Analog Devices Utility to take ad9361 data and unpack from the AXIS bus to the DAC
   util_upack2 #(
     .NUM_OF_CHANNELS(8),
     .SAMPLES_PER_CHANNEL(1),
     .SAMPLE_DATA_WIDTH(16)
   ) inst_dac_upack (
-
     .clk(d_clk),
     .reset(p_reset),
-
     .enable_0(fifo_din_enable_i0),
     .enable_1(fifo_din_enable_q0),
     .enable_2(fifo_din_enable_i1),
@@ -1330,11 +1316,9 @@ module ad9361x2_pl_wrapper #(
     .enable_61(1'b0),
     .enable_62(1'b0),
     .enable_63(1'b0),
-
     .fifo_rd_en(fifo_dac_valid_i0 | fifo_dac_valid_q0 | fifo_dac_valid_i1 | fifo_dac_valid_q1 | fifo_dac_valid_i2 | fifo_dac_valid_q2 | fifo_dac_valid_i3 | fifo_dac_valid_q3),
     .fifo_rd_valid(fifo_rd_valid),
     .fifo_rd_underflow(fifo_din_unf),
-
     .fifo_rd_data_0(fifo_dac_data_i0),
     .fifo_rd_data_1(fifo_dac_data_q0),
     .fifo_rd_data_2(fifo_dac_data_i1),
@@ -1399,21 +1383,20 @@ module ad9361x2_pl_wrapper #(
     .fifo_rd_data_61(),
     .fifo_rd_data_62(),
     .fifo_rd_data_63(),
-
     .s_axis_valid(fifo_s_axis_valid),
     .s_axis_ready(fifo_s_axis_ready),
     .s_axis_data(fifo_s_axis_data)
   );
 
+  // Module: inst_dac_fifo
+  //
+  // Analog Devices FIFO for AD9361 DAC BUS
   util_rfifo #(
     .NUM_OF_CHANNELS(8),
     .DIN_DATA_WIDTH(16),
     .DOUT_DATA_WIDTH(16),
     .DIN_ADDRESS_WIDTH(4)
   ) inst_dac_fifo (
-
-    // d-in interface
-
     .din_rstn(p_aresetn),
     .din_clk(d_clk),
     .din_enable_0(fifo_din_enable_i0),
@@ -1449,9 +1432,6 @@ module ad9361x2_pl_wrapper #(
     .din_valid_in_7(fifo_rd_valid),
     .din_data_7(fifo_dac_data_q3),
     .din_unf(fifo_din_unf),
-
-    // d-out interface
-
     .dout_rst(ad_reset_o),
     .dout_clk(l_clk),
     .dout_enable_0(dac_enable_i0),
@@ -1489,15 +1469,15 @@ module ad9361x2_pl_wrapper #(
     .dout_unf(dac_dunf)
   );
 
+  // Module: inst_adc_fifo
+  //
+  // Analog Devices FIFO for AD9361 ADC BUS
   util_wfifo #(
     .NUM_OF_CHANNELS(8),
     .DIN_DATA_WIDTH(16),
     .DOUT_DATA_WIDTH(16),
     .DIN_ADDRESS_WIDTH(4)
     ) inst_adc_fifo (
-
-    // d-in interface
-
     .din_rst(ad_reset_o),
     .din_clk(l_clk),
     .din_enable_0(adc_enable_i0),
@@ -1525,9 +1505,6 @@ module ad9361x2_pl_wrapper #(
     .din_valid_7(adc_valid_q3),
     .din_data_7(adc_data_q3),
     .din_ovf(din_ovf),
-
-    // d-out interface
-
     .dout_rstn(p_aresetn),
     .dout_clk(d_clk),
     .dout_enable_0(fifo_adc_enable_i0),
@@ -1557,6 +1534,9 @@ module ad9361x2_pl_wrapper #(
     .dout_ovf(fifo_dout_ovf)
   );
 
+  // Module: inst_clkdiv
+  //
+  // Analog Devices Clock Divider with select
   util_clkdiv #(
     .SIM_DEVICE(SIM_DEVICE)
   )  inst_clkdiv (
@@ -1565,6 +1545,9 @@ module ad9361x2_pl_wrapper #(
     .clk_out(d_clk)
   );
 
+  // Module: isnt_util_tdd_sync_0
+  //
+  // Analog Devices tdd sync utility
   util_tdd_sync #(
     .TDD_SYNC_PERIOD(100000000)
     ) isnt_util_tdd_sync_0 (
@@ -1575,6 +1558,9 @@ module ad9361x2_pl_wrapper #(
     .sync_out(sync_out_0)
   );
 
+  // Module: isnt_util_tdd_sync_1
+  //
+  // Analog Devices tdd sync utility
   util_tdd_sync #(
     .TDD_SYNC_PERIOD(100000000)
     ) isnt_util_tdd_sync_1 (
@@ -1585,6 +1571,9 @@ module ad9361x2_pl_wrapper #(
     .sync_out(sync_out_1)
   );
 
+  // Module: inst_ad_reset
+  //
+  // Analog Devices reset sync
   ad_rst inst_ad_reset (
     .rst_async(~axi_aresetn),
     .clk(d_clk),
@@ -1592,6 +1581,9 @@ module ad9361x2_pl_wrapper #(
     .rst(p_reset)
   );
 
+  // Module: inst_axilxbar
+  //
+  // AXI Lite crossbar for ADC DMA, DAC DMA, and AD9361 1/0 control registers.
   axilxbar #(
     .C_AXI_DATA_WIDTH(32),
     .C_AXI_ADDR_WIDTH(32),

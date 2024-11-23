@@ -1,0 +1,1 @@
+﻿NDFramePage.OnPageTitleLoaded("SystemVerilogModule:inst_ad9361x2_pl_wrapper","inst_ad9361x2_pl_wrapper");NDSummary.OnSummaryLoaded("SystemVerilogModule:inst_ad9361x2_pl_wrapper",[["SystemVerilog","SystemVerilog"]],[["Modules","Module"]],[[55,0,0,"inst_ad9361x2_pl_wrapper"]]);

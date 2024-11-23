@@ -1,0 +1,1 @@
+﻿NDFramePage.OnPageTitleLoaded("SystemVerilogModule:i_ref_clk_ibuf","i_ref_clk_ibuf");NDSummary.OnSummaryLoaded("SystemVerilogModule:i_ref_clk_ibuf",[["SystemVerilog","SystemVerilog"]],[["Modules","Module"]],[[36,0,0,"i_ref_clk_ibuf"]]);

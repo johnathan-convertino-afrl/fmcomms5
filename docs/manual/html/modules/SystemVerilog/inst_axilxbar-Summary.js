@@ -1,0 +1,1 @@
+﻿NDFramePage.OnPageTitleLoaded("SystemVerilogModule:inst_axilxbar","inst_axilxbar");NDSummary.OnSummaryLoaded("SystemVerilogModule:inst_axilxbar",[["SystemVerilog","SystemVerilog"]],[["Modules","Module"]],[[111,0,0,"inst_axilxbar"]]);

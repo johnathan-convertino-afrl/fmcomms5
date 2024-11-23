@@ -1,0 +1,1 @@
+﻿NDFramePage.OnPageTitleLoaded("SystemVerilogModule:i_gpio_bd","i_gpio_bd");NDSummary.OnSummaryLoaded("SystemVerilogModule:i_gpio_bd",[["SystemVerilog","SystemVerilog"]],[["Modules","Module"]],[[39,0,0,"i_gpio_bd"]]);

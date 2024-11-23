@@ -1,5 +1,8 @@
 # FMCOMM5 FPGA Project
 ### Contains core files and scripts to generate a fmcomms5 platform using fusesoc.
+
+![image](docs/manual/img/AFRL.png)
+
 ---
 
    author: Jay Convertino
@@ -19,7 +22,13 @@
 #### Previous
   - none
 
-### Dependencies
+### DOCUMENTATION
+  For detailed usage information, please navigate to one of the following sources. They are the same, just in a different format.
+
+  - [fmcomms5.pdf](docs/manual/fmcomms5.pdf)
+  - [github page](https://johnathan-convertino-afrl.github.io/fmcomms5/)
+
+### DEPENDENCIES
 #### Build
   - AD:common:ad_iobuf:1.0.0
   - AFRL:utility:xilinx_zc706_board_base:1.0.0
@@ -45,9 +54,7 @@
 #### Simulation
   - none, not implimented.
 
-### IP USAGE
-#### Parameters
-##### ad9361_pl_wrapper.v
+### PARAMETERS
   * FPGA_TECHNOLOGY : See ad_hdl_fusesoc readme.md for details
   * FPGA_FAMILY : See ad_hdl_fusesoc readme.md for details
   * SPEED_GRADE : See ad_hdl_fusesoc readme.md for details
@@ -61,51 +68,12 @@
   * AXI_AD9361_0_ADDR : Set address of AD9361 0, default: 32'h79020000
   * AXI_AD9361_1_ADDR : Set address of AD9361 1, default: 32'h79040000
 
-### COMPONENTS
-#### a10soc
-  - system_constr.sdc
-  - system_gen.tcl
-  - system_pl_gen.tcl
-  - system_pl_wrapper.v
-  - system_wrapper.v
-
-#### a10soc/max5
-This is a modification to allow a GPIO pin routed through the max5 IO CPLD access to the FPGA from the FMC.
-  - io_max5.zip
-  - max5.pof
-  - max5.vhd
-  - README.md
-
-#### common:
-  - ad9361x2_pl_wrapper.v
-
-#### zc702
-  - system_constr.xdc
-  - system_gen.tcl
-  - system_pl_gen.tcl
-  - system_pl_wrapper.v
-  - system_wrapper.v
-
-#### zc706
-  - system_constr.xdc
-  - system_gen.tcl
-  - system_pl_gen.tcl
-  - system_pl_wrapper.v
-  - system_wrapper.v
-
-#### zcu102
-  - system_constr.xdc
-  - system_gen.tcl
-  - system_pl_gen.tcl
-  - system_pl_wrapper.v
-  - system_wrapper.v
-
-### fusesoc
+### FUSESOC
 
 * fusesoc_info.core created.
 * Simulation not available
 
-#### TARGETS
+#### Targets
 
 * RUN WITH: (fusesoc run --target=zed_bootgen VENDER:CORE:NAME:VERSION)
 * -- target can be one of the below.

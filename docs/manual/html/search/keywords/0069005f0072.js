@@ -1,0 +1,1 @@
+﻿NDSearch.OnPrefixDataLoaded("i_r",["Module"],[["i_ref_clk_ibuf",,[[,,,,0,"File2:system_wrapper.v:i_ref_clk_ibuf","SystemVerilogModule:i_ref_clk_ibuf"]]],["i_ref_clk_ibuf_ds",,[[,,,,0,"File4:system_wrapper.v:i_ref_clk_ibuf_ds","SystemVerilogModule:i_ref_clk_ibuf_ds"]]],["i_ref_clk_rbuf",,[[,,,,0,"File2:system_wrapper.v:i_ref_clk_rbuf","SystemVerilogModule:i_ref_clk_rbuf"]]]]);

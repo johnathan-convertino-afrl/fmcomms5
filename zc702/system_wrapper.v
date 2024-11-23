@@ -1,31 +1,134 @@
 //******************************************************************************
-/// @FILE    system_wrapper.v
-/// @AUTHOR  JAY CONVERTINO
-/// @DATE    2023.11.02
-/// @BRIEF   System wrapper for pl and ps.
-///
-/// @LICENSE MIT
-///  Copyright 2023 Jay Convertino
-///
-///  Permission is hereby granted, free of charge, to any person obtaining a copy
-///  of this software and associated documentation files (the "Software"), to
-///  deal in the Software without restriction, including without limitation the
-///  rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
-///  sell copies of the Software, and to permit persons to whom the Software is
-///  furnished to do so, subject to the following conditions:
-///
-///  The above copyright notice and this permission notice shall be included in
-///  all copies or substantial portions of the Software.
-///
-///  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-///  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-///  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-///  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-///  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-///  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
-///  IN THE SOFTWARE.
+//  file:     system_wrapper.v
+//
+//  author:   JAY CONVERTINO
+//
+//  date:     2023/11/02
+//
+//  about:    Brief
+//  System wrapper for pl and ps for zc702 board.
+//
+//  license: License MIT
+//  Copyright 2023 Jay Convertino
+//
+//  Permission is hereby granted, free of charge, to any person obtaining a copy
+//  of this software and associated documentation files (the "Software"), to
+//  deal in the Software without restriction, including without limitation the
+//  rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+//  sell copies of the Software, and to permit persons to whom the Software is
+//  furnished to do so, subject to the following conditions:
+//
+//  The above copyright notice and this permission notice shall be included in
+//  all copies or substantial portions of the Software.
+//
+//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+//  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+//  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+//  IN THE SOFTWARE.
 //******************************************************************************
 
+/*
+ * Module: system_wrapper
+ *
+ * System wrapper for pl and ps for zc702 board.
+ *
+ * Parameters:
+ *
+ * FPGA_TECHNOLOGY        - Type of FPGA, such as Ultrascale, Arria 10. 1 is for 7 series.
+ * FPGA_FAMILY            - Sub type of fpga, such as GX, SX, etc. 4 is for zynq.
+ * SPEED_GRADE            - Number that corresponds to the ships recommeneded speed. 10 is for -1.
+ * DEV_PACKAGE            - Specify a number that is equal to the manufactures package. 14 is for cl.
+ * DELAY_REFCLK_FREQUENCY - Reference clock frequency used for ad_data_in instances
+ * ADC_INIT_DELAY         - Initial Delay for the ADC
+ * DAC_INIT_DELAY         - Initial Delay for the DAC
+ *
+ * Ports:
+ *
+ * ddr_addr               - DDR interface
+ * ddr_ba                 - DDR interface
+ * ddr_cas_n              - DDR interface
+ * ddr_ck_n               - DDR interface
+ * ddr_ck_p               - DDR interface
+ * ddr_cke                - DDR interface
+ * ddr_cs_n               - DDR interface
+ * ddr_dm                 - DDR interface
+ * ddr_dq                 - DDR interface
+ * ddr_dqs_n              - DDR interface
+ * ddr_dqs_p              - DDR interface
+ * ddr_odt                - DDR interface
+ * ddr_ras_n              - DDR interface
+ * ddr_reset_n            - DDR interface
+ * ddr_we_n               - DDR interface
+ * fixed_io_ddr_vrn       - DDR interface
+ * fixed_io_ddr_vrp       - DDR interface
+ * fixed_io_mio           - ps mio
+ * fixed_io_ps_clk        - ps clk
+ * fixed_io_ps_porb       - ps por
+ * fixed_io_ps_srstb      - ps rst
+ * iic_scl_fmc            - fmcomms5 i2c
+ * iic_sda_fmc            - fmcomms5 i2c
+ * gpio_bd                - gpio
+ * rx_clk_in_0_p          - fmcomms5 0 rx clk
+ * rx_clk_in_0_n          - fmcomms5 0 rx clk
+ * rx_frame_in_0_p        - fmcomms5 0 rx frame
+ * rx_frame_in_0_n        - fmcomms5 0 rx frame
+ * rx_data_in_0_p         - fmcomms5 0 rx data
+ * rx_data_in_0_n         - fmcomms5 0 rx data
+ * tx_clk_out_0_p         - fmcomms5 0 tx clk
+ * tx_clk_out_0_n         - fmcomms5 0 tx clk
+ * tx_frame_out_0_p       - fmcomms5 0 tx frame
+ * tx_frame_out_0_n       - fmcomms5 0 tx frame
+ * tx_data_out_0_p        - fmcomms5 0 tx data
+ * tx_data_out_0_n        - fmcomms5 0 tx data
+ * gpio_status_0          - fmcomms5 0 gpio
+ * gpio_ctl_0             - fmcomms5 0 gpio
+ * gpio_en_agc_0          - fmcomms5 0 gpio
+ * gpio_resetb_0          - fmcomms5 0 gpio
+ * gpio_debug_1_0         - fmcomms5 0 gpio
+ * gpio_debug_2_0         - fmcomms5 0 gpio
+ * gpio_calsw_1_0         - fmcomms5 0 gpio
+ * gpio_calsw_2_0         - fmcomms5 0 gpio
+ * gpio_ad5355_rfen       - fmcomms5 0 gpio
+ * gpio_ad5355_lock       - fmcomms5 0 gpio
+ * txnrx_0                - fmcomms5 0 txnrx
+ * enable_0               - fmcomms5 0 enable
+ * rx_clk_in_1_p          - fmcomms5 1 rx clk
+ * rx_clk_in_1_n          - fmcomms5 1 rx clk
+ * rx_frame_in_1_p        - fmcomms5 1 rx frame
+ * rx_frame_in_1_n        - fmcomms5 1 rx frame
+ * rx_data_in_1_p         - fmcomms5 1 rx data
+ * rx_data_in_1_n         - fmcomms5 1 rx data
+ * tx_clk_out_1_p         - fmcomms5 1 tx clk
+ * tx_clk_out_1_n         - fmcomms5 1 tx clk
+ * tx_frame_out_1_p       - fmcomms5 1 tx frame
+ * tx_frame_out_1_n       - fmcomms5 1 tx frame
+ * tx_data_out_1_p        - fmcomms5 1 tx data
+ * tx_data_out_1_n        - fmcomms5 1 tx data
+ * gpio_status_1          - fmcomms5 1 gpio
+ * gpio_ctl_1             - fmcomms5 1 gpio
+ * gpio_en_agc_1          - fmcomms5 1 gpio
+ * gpio_resetb_1          - fmcomms5 1 gpio
+ * gpio_debug_1_1         - fmcomms5 1 gpio
+ * gpio_debug_2_1         - fmcomms5 1 gpio
+ * gpio_calsw_1_1         - fmcomms5 1 gpio
+ * gpio_calsw_2_1         - fmcomms5 1 gpio
+ * gpio_ad5355_rfen       - fmcomms5 1 gpio
+ * gpio_ad5355_lock       - fmcomms5 1 gpio
+ * txnrx_1                - fmcomms5 1 txnrx
+ * enable_1               - fmcomms5 1 enable
+ * mcs_sync               - fmcomms5 sync
+ * spi_ad9361_0           - fmcomms5 ad9361 0 spi select
+ * spi_ad9361_1           - fmcomms5 ad9361 1 spi select
+ * spi_ad5355             - fmcomms5 ad5355 spi select
+ * spi_clk                - fmcomms5 spi clock
+ * spi_mosi               - fmcomms5 spi master out
+ * spi_miso               - fmcomms5 spi master in
+ * ref_clk_p              - fmcomms5 ref clock p
+ * ref_clk_n              - fmcomms5 ref clock n
+ */
 module system_wrapper #(
     parameter FPGA_TECHNOLOGY = 1,
     parameter FPGA_FAMILY = 4,
@@ -50,20 +153,15 @@ module system_wrapper #(
     inout                   ddr_ras_n,
     inout                   ddr_reset_n,
     inout                   ddr_we_n,
-
     inout                   fixed_io_ddr_vrn,
     inout                   fixed_io_ddr_vrp,
     inout       [53:0]      fixed_io_mio,
     inout                   fixed_io_ps_clk,
     inout                   fixed_io_ps_porb,
     inout                   fixed_io_ps_srstb,
-
     inout                   iic_scl_fmc,
     inout                   iic_sda_fmc,
-
     inout       [ 15:0]     gpio_bd,
-
-    //ID 0
     input                   rx_clk_in_0_p,
     input                   rx_clk_in_0_n,
     input                   rx_frame_in_0_p,
@@ -88,8 +186,6 @@ module system_wrapper #(
     inout                   gpio_ad5355_lock,
     output                  enable_0,
     output                  txnrx_0,
-
-    //ID 1
     input                   rx_clk_in_1_p,
     input                   rx_clk_in_1_n,
     input                   rx_frame_in_1_p,
@@ -116,16 +212,13 @@ module system_wrapper #(
     inout                   gpio_calsw_4_1,
     output                  txnrx_1,
     output                  enable_1,
-
     output                  mcs_sync,
-
     output                  spi_ad9361_0,
     output                  spi_ad9361_1,
     output                  spi_ad5355,
     output                  spi_clk,
     output                  spi_mosi,
     input                   spi_miso,
-
     input                   ref_clk_p,
     input                   ref_clk_n
   );
@@ -224,11 +317,24 @@ module system_wrapper #(
     end
   end
 
+  assign gpio_i[63:60] = gpio_o[63:60];
+  assign gpio_i[45:44] = gpio_o[45:44];
+
+  assign mcs_sync = r_mcs_sync;
+
+  // Group: Instantianted Modules
+
+  // Module: i_ref_clk_ibuf
+  //
+  // Module instance of IBUFGDS for LVDS to cmos clock
   IBUFGDS i_ref_clk_ibuf (
     .I (ref_clk_p),
     .IB (ref_clk_n),
     .O (ref_clk_s));
 
+  // Module: i_ref_clk_rbuf
+  //
+  // Module instance of BUFR for cmos clock to clock region.
   BUFR #(
     .BUFR_DIVIDE ("BYPASS")
   ) i_ref_clk_rbuf (
@@ -237,35 +343,41 @@ module system_wrapper #(
     .I (ref_clk_s),
     .O (ref_clk));
 
+  // Module: i_iobuf
+  //
+  // Module instance of ad_iobuf for tristate GPIO control.
   ad_iobuf #(
     .DATA_WIDTH(42)
   ) i_iobuf (
     .dio_t ({gpio_t[59:46], gpio_t[43:16]}),
     .dio_i ({gpio_o[59:46], gpio_o[43:16]}),
     .dio_o ({gpio_i[59:46], gpio_i[43:16]}),
-    .dio_p ({ gpio_resetb_1,    // 59
-              gpio_ad5355_lock, // 58
-              gpio_ad5355_rfen, // 57
-              gpio_calsw_4_1,   // 56
-              gpio_calsw_3_1,   // 55
-              gpio_calsw_2_0,   // 54
-              gpio_calsw_1_0,   // 53
-              gpio_txnrx_1,     // 52
-              gpio_enable_1,    // 51
-              gpio_en_agc_1,    // 50
-              gpio_txnrx_0,     // 49
-              gpio_enable_0,    // 48
-              gpio_en_agc_0,    // 47
-              gpio_resetb_0,    // 46
-              gpio_debug_4_1,   // 43
-              gpio_debug_3_1,   // 42
-              gpio_debug_2_0,   // 41
-              gpio_debug_1_0,   // 40
-              gpio_ctl_1,       // 39:36
-              gpio_ctl_0,       // 35:32
-              gpio_status_1,    // 31:24
-              gpio_status_0})); // 23:16
+    .dio_p ({ gpio_resetb_1,
+              gpio_ad5355_lock,
+              gpio_ad5355_rfen,
+              gpio_calsw_4_1,
+              gpio_calsw_3_1,
+              gpio_calsw_2_0,
+              gpio_calsw_1_0,
+              gpio_txnrx_1,
+              gpio_enable_1,
+              gpio_en_agc_1,
+              gpio_txnrx_0,
+              gpio_enable_0,
+              gpio_en_agc_0,
+              gpio_resetb_0,
+              gpio_debug_4_1,
+              gpio_debug_3_1,
+              gpio_debug_2_0,
+              gpio_debug_1_0,
+              gpio_ctl_1,
+              gpio_ctl_0,
+              gpio_status_1,
+              gpio_status_0}));
 
+  // Module: i_gpio_bd
+  //
+  // Module instance of ad_iobuf for tristate GPIO bd control.
   ad_iobuf #(
     .DATA_WIDTH(16)
   ) i_gpio_bd (
@@ -274,13 +386,9 @@ module system_wrapper #(
     .dio_o (gpio_i[15:0]),
     .dio_p ({gpio_bd[7:4], gpio_bd[15:8], gpio_bd[3:0]}));
 
-  assign gpio_i[63:60] = gpio_o[63:60];
-  assign gpio_i[45:44] = gpio_o[45:44];
-
-  assign mcs_sync = r_mcs_sync;
-
-  // back to my wrappers
-
+  // Module: inst_system_pl_wrapper
+  //
+  // Module instance of system_pl_wrapper for the fmcomms5 device.
   system_pl_wrapper #(
     .FPGA_TECHNOLOGY(FPGA_TECHNOLOGY),
     .FPGA_FAMILY(FPGA_FAMILY),
@@ -290,10 +398,8 @@ module system_wrapper #(
     .DAC_INIT_DELAY(DAC_INIT_DELAY),
     .DELAY_REFCLK_FREQUENCY(DELAY_REFCLK_FREQUENCY)
   ) inst_system_pl_wrapper (
-    //AXI4LITE SLAVE INTERFACE TO CROSSBAR
     .axi_aclk(s_axi_clk),
     .axi_aresetn(s_axi_aresetn),
-
     .s_axi_awvalid(w_axi_awvalid),
     .s_axi_awaddr(w_axi_awaddr),
     .s_axi_awready(w_axi_awready),
@@ -313,64 +419,47 @@ module system_wrapper #(
     .s_axi_rready(w_axi_rready),
     .s_axi_rresp(w_axi_rresp),
     .s_axi_rdata(w_axi_rdata),
-
-    //irq
     .adc_dma_irq(s_adc_dma_irq),
     .dac_dma_irq(s_dac_dma_irq),
-
-    //AD9361 IO
-    //clocks
     .delay_clk(s_delay_clk),
-    //ID 0
-    //RX LVDS
     .rx_clk_in_0_p(rx_clk_in_0_p),
     .rx_clk_in_0_n(rx_clk_in_0_n),
     .rx_frame_in_0_p(rx_frame_in_0_p),
     .rx_frame_in_0_n(rx_frame_in_0_n),
     .rx_data_in_0_p(rx_data_in_0_p),
     .rx_data_in_0_n(rx_data_in_0_n),
-    //TX LVDS
     .tx_clk_out_0_p(tx_clk_out_0_p),
     .tx_clk_out_0_n(tx_clk_out_0_n),
     .tx_frame_out_0_p(tx_frame_out_0_p),
     .tx_frame_out_0_n(tx_frame_out_0_n),
     .tx_data_out_0_p(tx_data_out_0_p),
     .tx_data_out_0_n(tx_data_out_0_n),
-    //MISC
     .enable_0(enable_0),
     .txnrx_0(txnrx_0),
     .up_enable_0(gpio_enable_0),
     .up_txnrx_0(gpio_txnrx_0),
-    //sync
     .tdd_sync_0_t(),
     .tdd_sync_0_i(1'b0),
     .tdd_sync_0_o(),
-    //ID 1
-    //RX LVDS
     .rx_clk_in_1_p(rx_clk_in_1_p),
     .rx_clk_in_1_n(rx_clk_in_1_n),
     .rx_frame_in_1_p(rx_frame_in_1_p),
     .rx_frame_in_1_n(rx_frame_in_1_n),
     .rx_data_in_1_p(rx_data_in_1_p),
     .rx_data_in_1_n(rx_data_in_1_n),
-    //TX LVDS
     .tx_clk_out_1_p(tx_clk_out_1_p),
     .tx_clk_out_1_n(tx_clk_out_1_n),
     .tx_frame_out_1_p(tx_frame_out_1_p),
     .tx_frame_out_1_n(tx_frame_out_1_n),
     .tx_data_out_1_p(tx_data_out_1_p),
     .tx_data_out_1_n(tx_data_out_1_n),
-    //MISC
     .enable_1(enable_1),
     .txnrx_1(txnrx_1),
     .up_enable_1(gpio_enable_1),
     .up_txnrx_1(gpio_txnrx_1),
-    //sync
     .tdd_sync_1_t(),
     .tdd_sync_1_i(1'b0),
     .tdd_sync_1_o(),
-
-    //axi interface for the adc to the hp interface
     .adc_m_dest_axi_awaddr(adc_hp0_axi_awaddr),
     .adc_m_dest_axi_awlen(adc_hp0_axi_awlen),
     .adc_m_dest_axi_awsize(adc_hp0_axi_awsize),
@@ -387,8 +476,6 @@ module system_wrapper #(
     .adc_m_dest_axi_bvalid(adc_hp0_axi_bvalid),
     .adc_m_dest_axi_bresp(adc_hp0_axi_bresp),
     .adc_m_dest_axi_bready(adc_hp0_axi_bready),
-
-    //axi interface for dac to the hp interface
     .dac_m_src_axi_arready(dac_hp1_axi_arready),
     .dac_m_src_axi_arvalid(dac_hp1_axi_arvalid),
     .dac_m_src_axi_araddr(dac_hp1_axi_araddr),
@@ -402,28 +489,28 @@ module system_wrapper #(
     .dac_m_src_axi_rvalid(dac_hp1_axi_rvalid),
     .dac_m_src_axi_rresp(dac_hp1_axi_rresp),
     .dac_m_src_axi_rlast(dac_hp1_axi_rlast),
-
     .iic_scl_fmc(iic_scl_fmc),
     .iic_sda_fmc(iic_sda_fmc),
     .iic2intc_irpt(s_iic2intc_irpt)
   );
 
+  // Module: inst_system_ps_wrapper
+  //
+  // Module instance of inst_system_ps_wrapper for the built in CPU.
   system_ps_wrapper inst_system_ps_wrapper
     (
       .GPIO_I(gpio_i),
       .GPIO_O(gpio_o),
       .GPIO_T(gpio_t),
-
-      .SPI0_SCLK_I(1'b0), //spi_clk connected in AD
+      .SPI0_SCLK_I(1'b0),
       .SPI0_SCLK_O(spi_clk),
-      .SPI0_MOSI_I(1'b0), //spi_mosi connected in AD
+      .SPI0_MOSI_I(1'b0),
       .SPI0_MOSI_O(spi_mosi),
       .SPI0_MISO_I(spi_miso),
       .SPI0_SS_I(1'b1),
       .SPI0_SS_O(spi_ad9361_0),
       .SPI0_SS1_O(spi_ad9361_1),
       .SPI0_SS2_O(spi_ad5355),
-
       .SPI1_SCLK_I(1'b0),
       .SPI1_SCLK_O(),
       .SPI1_MOSI_I(1'b0),
@@ -433,7 +520,6 @@ module system_wrapper #(
       .SPI1_SS_O(),
       .SPI1_SS1_O(),
       .SPI1_SS2_O(),
-
       .M_AXI_araddr(w_axi_araddr),
       .M_AXI_arprot(w_axi_arprot),
       .M_AXI_arready(w_axi_arready),
@@ -453,7 +539,6 @@ module system_wrapper #(
       .M_AXI_wready(w_axi_wready),
       .M_AXI_wstrb(w_axi_wstrb),
       .M_AXI_wvalid(w_axi_wvalid),
-
       .S_AXI_HP0_arready(),
       .S_AXI_HP0_awready(adc_hp0_axi_awready),
       .S_AXI_HP0_bvalid(adc_hp0_axi_bvalid),

@@ -1,0 +1,27 @@
+\documentclass[usletter]{article}
+\usepackage{DejaVuSans}
+\renewcommand*\familydefault{\sfdefault}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{listings}
+\lstset{
+  breaklines=true,
+  postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space},
+}
+\usepackage{pdfpages}
+\usepackage[hidelinks]{hyperref}
+\begin{document}
+
+  \include{src/common.tex}
+
+  %module documentation section
+
+  \includepdf[pages=-, addtotoc={1,subsection,1,ad9361x2 system pl,p1}, pagecommand={}]{files_ad9361x2_pl_wrapper-v.pdf}
+  \includepdf[pages=-, addtotoc={1,subsection,1,zc702 system pl,p1}, pagecommand={}]{files2_system_pl_wrapper-v.pdf}
+  \includepdf[pages=-, addtotoc={1,subsection,1,zc702 system,p1}, pagecommand={}]{files2_system_wrapper-v.pdf}
+  \includepdf[pages=-, addtotoc={1,subsection,1,zc706 system pl,p1}, pagecommand={}]{files3_system_pl_wrapper-v.pdf}
+  \includepdf[pages=-, addtotoc={1,subsection,1,zc706 system,p1}, pagecommand={}]{files3_system_wrapper-v.pdf}
+  \includepdf[pages=-, addtotoc={1,subsection,1,zcu102 system pl,p1}, pagecommand={}]{files4_system_pl_wrapper-v.pdf}
+  \includepdf[pages=-, addtotoc={1,subsection,1,zcu102 system,p1}, pagecommand={}]{files4_system_wrapper-v.pdf}
+
+\end{document}

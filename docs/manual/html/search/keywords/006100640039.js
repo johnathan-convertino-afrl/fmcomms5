@@ -1,0 +1,1 @@
+﻿NDSearch.OnPrefixDataLoaded("ad9",["Module","File"],[["ad9361x2_pl_wrapper",,[[,,,,0,"File:ad9361x2_pl_wrapper.v:ad9361x2_pl_wrapper","SystemVerilogModule:ad9361x2_pl_wrapper"],[,"ad9361x2_pl_wrapper.v",,,1,"File:ad9361x2_pl_wrapper.v:ad9361x2_pl_wrapper.v"]]]]);

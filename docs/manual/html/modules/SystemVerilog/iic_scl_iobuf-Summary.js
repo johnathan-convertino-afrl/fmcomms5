@@ -1,0 +1,1 @@
+﻿NDFramePage.OnPageTitleLoaded("SystemVerilogModule:iic_scl_iobuf","iic_scl_iobuf");NDSummary.OnSummaryLoaded("SystemVerilogModule:iic_scl_iobuf",[["SystemVerilog","SystemVerilog"]],[["Modules","Module"]],[[53,0,0,"iic_scl_iobuf"]]);

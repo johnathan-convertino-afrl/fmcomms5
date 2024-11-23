@@ -1,0 +1,1 @@
+﻿NDFramePage.OnPageTitleLoaded("SystemVerilogModule:inst_clkdiv","inst_clkdiv");NDSummary.OnSummaryLoaded("SystemVerilogModule:inst_clkdiv",[["SystemVerilog","SystemVerilog"]],[["Modules","Module"]],[[107,0,0,"inst_clkdiv"]]);

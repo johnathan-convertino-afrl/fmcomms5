@@ -1,0 +1,1 @@
+﻿NDFramePage.OnPageTitleLoaded("SystemVerilogModule:inst_dac_cpack","inst_dac_cpack");NDSummary.OnSummaryLoaded("SystemVerilogModule:inst_dac_cpack",[["SystemVerilog","SystemVerilog"]],[["Modules","Module"]],[[104,0,0,"inst_dac_cpack"]]);
