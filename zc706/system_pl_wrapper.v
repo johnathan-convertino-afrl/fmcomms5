@@ -211,7 +211,7 @@ module system_pl_wrapper #(
     input           up_enable_1,
     input           up_txnrx_1,
     output          tdd_sync_1_t,
-    input           qtdd_sync_1_i,
+    input           tdd_sync_1_i,
     output          tdd_sync_1_o,
     output [31:0]   adc_m_dest_axi_awaddr,
     output [ 3:0]   adc_m_dest_axi_awlen,
