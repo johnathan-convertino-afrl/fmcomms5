@@ -1,5 +1,6 @@
 # FMCOMM5 FPGA Project
 ### Contains core files and scripts to generate a fmcomms5 platform using fusesoc.
+---
 
 ![image](docs/manual/img/AFRL.png)
 
